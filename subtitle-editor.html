@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -740,10 +741,484 @@
             color: #333;
             text-decoration: underline;
         }
+
+        /* ===== 認証・プラン関連 ===== */
+
+        /* ログインオーバーレイ */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(245, 245, 245, 0.97);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-overlay.hidden {
+            display: none;
+        }
+
+        .login-box {
+            text-align: center;
+            background: white;
+            padding: 48px 40px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-box h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2em;
+            font-weight: 500;
+            color: #222;
+            margin-bottom: 8px;
+        }
+
+        .login-box p {
+            color: #888;
+            font-size: 0.95em;
+            margin-bottom: 28px;
+        }
+
+        .google-login-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 32px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .google-login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .google-login-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* 認証バー */
+        .auth-bar {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .auth-bar.visible {
+            display: flex;
+        }
+
+        .auth-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #eee;
+        }
+
+        .auth-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .auth-plan-badge {
+            padding: 2px 10px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .auth-plan-badge.free {
+            background: #f0f0f0;
+            color: #888;
+        }
+
+        .auth-plan-badge.plus {
+            background: #333;
+            color: white;
+        }
+
+        .auth-plan-badge.pro {
+            background: #111;
+            color: white;
+        }
+
+        .auth-usage {
+            color: #888;
+            font-size: 0.85em;
+        }
+
+        .auth-spacer {
+            flex: 1;
+        }
+
+        .auth-upgrade-btn {
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .auth-upgrade-btn:hover {
+            background: #111;
+        }
+
+        .auth-manage-btn,
+        .auth-logout-btn {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.85em;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .auth-manage-btn:hover,
+        .auth-logout-btn:hover {
+            background: #f5f5f5;
+        }
+
+        /* ステップロックオーバーレイ */
+        .step-lock-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 100;
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .step-lock-overlay.visible {
+            display: flex;
+        }
+
+        .step-section {
+            position: relative;
+        }
+
+        .step-lock-icon {
+            width: 40px;
+            height: 40px;
+            stroke: #999;
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        .step-lock-text {
+            color: #888;
+            font-size: 0.95em;
+            text-align: center;
+        }
+
+        .step-lock-upgrade-btn {
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .step-lock-upgrade-btn:hover {
+            background: #111;
+        }
+
+        /* 料金モーダル */
+        .pricing-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 20000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pricing-overlay.visible {
+            display: flex;
+        }
+
+        .pricing-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 36px;
+            max-width: 780px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .pricing-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .pricing-close:hover {
+            color: #333;
+        }
+
+        .pricing-title {
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 6px;
+        }
+
+        .pricing-subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        /* 月払い/年払い切替 */
+        .billing-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            font-size: 0.9em;
+        }
+
+        .billing-toggle-label {
+            color: #888;
+        }
+
+        .billing-toggle-label.active {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .billing-toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .billing-toggle-switch.yearly {
+            background: #333;
+        }
+
+        .billing-toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .billing-toggle-switch.yearly::after {
+            transform: translateX(20px);
+        }
+
+        .billing-save-badge {
+            background: #333;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        /* プランカード */
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 640px) {
+            .pricing-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pricing-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 24px 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .pricing-card.current {
+            border-color: #333;
+        }
+
+        .pricing-card-name {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .pricing-card-price {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 2px;
+        }
+
+        .pricing-card-price span {
+            font-size: 0.4em;
+            font-weight: normal;
+            color: #888;
+        }
+
+        .pricing-card-billing {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 16px;
+        }
+
+        .pricing-card-features {
+            text-align: left;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            font-size: 0.88em;
+            color: #555;
+        }
+
+        .pricing-card-features li {
+            padding: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pricing-card-features li::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") center/contain no-repeat;
+            flex-shrink: 0;
+        }
+
+        .pricing-card-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pricing-card-btn.current {
+            background: #f0f0f0;
+            color: #888;
+            border: 1px solid #ddd;
+            cursor: default;
+        }
+
+        .pricing-card-btn.upgrade {
+            background: #333;
+            color: white;
+            border: none;
+        }
+
+        .pricing-card-btn.upgrade:hover {
+            background: #111;
+        }
     </style>
 </head>
 <body>
+    <!-- ログインオーバーレイ -->
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-box">
+            <h2>jimacraft</h2>
+            <p>文字起こしテキストからSRT字幕ファイルを生成</p>
+            <button class="google-login-btn" onclick="loginWithGoogle()">
+                <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                Google でログイン
+            </button>
+        </div>
+    </div>
+
+    <!-- 料金モーダル -->
+    <div class="pricing-overlay" id="pricing-overlay">
+        <div class="pricing-modal">
+            <button class="pricing-close" onclick="closePricing()">&times;</button>
+            <div class="pricing-title">プランを選択</div>
+            <div class="pricing-subtitle">あなたの制作ワークフローに合ったプランを</div>
+
+            <div class="billing-toggle">
+                <span class="billing-toggle-label active" id="billing-monthly-label">月払い</span>
+                <div class="billing-toggle-switch" id="billing-toggle" onclick="toggleBilling()"></div>
+                <span class="billing-toggle-label" id="billing-yearly-label">年払い</span>
+                <span class="billing-save-badge">2ヶ月分お得</span>
+            </div>
+
+            <div class="pricing-cards" id="pricing-cards">
+                <!-- JS で動的生成 -->
+            </div>
+        </div>
+    </div>
+
     <div class="container">
+        <!-- 認証バー -->
+        <div class="auth-bar" id="auth-bar">
+            <img class="auth-avatar" id="auth-avatar" src="" alt="">
+            <span class="auth-name" id="auth-name"></span>
+            <span class="auth-plan-badge free" id="auth-plan-badge">FREE</span>
+            <span class="auth-usage" id="auth-usage"></span>
+            <div class="auth-spacer"></div>
+            <button class="auth-upgrade-btn" id="auth-upgrade-btn" onclick="openPricing()">アップグレード</button>
+            <button class="auth-manage-btn" id="auth-manage-btn" onclick="openPortal()" style="display:none;">契約管理</button>
+            <button class="auth-logout-btn" onclick="logout()">ログアウト</button>
+        </div>
+
         <h1>jimacraft</h1>
         <p class="subtitle-header">文字起こしテキストからSRT字幕ファイルを生成</p>
 
@@ -969,6 +1444,11 @@
 
         <!-- ===== STEP 2 ===== -->
         <div class="step-section" id="step2-section">
+            <div class="step-lock-overlay" id="step2-lock">
+                <svg class="step-lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                <div class="step-lock-text">Plusプラン以上で利用できます</div>
+                <button class="step-lock-upgrade-btn" onclick="openPricing()">アップグレード</button>
+            </div>
             <div class="step-header">
                 <div class="step-number">2</div>
                 <div class="step-title">マーカー編集</div>
@@ -1012,6 +1492,11 @@
 
         <!-- ===== STEP 3 ===== -->
         <div class="step-section" id="step3-section">
+            <div class="step-lock-overlay" id="step3-lock">
+                <svg class="step-lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                <div class="step-lock-text">Proプランで利用できます</div>
+                <button class="step-lock-upgrade-btn" onclick="openPricing()">アップグレード</button>
+            </div>
             <div class="step-header">
                 <div class="step-number">3</div>
                 <div class="step-title">話者別分割</div>
@@ -1119,6 +1604,318 @@
         // グローバル変数
         let speakerData = {};
         let prepType = null; // 'mp4' | 'mp3' | 'text'
+        let currentUser = null;
+        let currentProfile = null;
+        let supabaseClient = null;
+        let billingYearly = false;
+
+        // ==================== Supabase初期化 ====================
+
+        (function initSupabase() {
+            const url = window.__SUPABASE_URL__;
+            const key = window.__SUPABASE_ANON_KEY__;
+            if (url && key) {
+                supabaseClient = supabase.createClient(url, key);
+                checkAuth();
+            } else {
+                // Supabase未設定 → ログイン不要モード（開発用）
+                document.getElementById('login-overlay').classList.add('hidden');
+            }
+        })();
+
+        async function checkAuth() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                await loadProfile(session.access_token);
+                onAuthReady();
+            } else {
+                document.getElementById('login-overlay').classList.remove('hidden');
+            }
+
+            // URLにcheckoutパラメータがある場合
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('checkout') === 'success') {
+                showToast('アップグレードが完了しました');
+                window.history.replaceState({}, '', '/');
+                // プロフィール再読み込み（Webhookの反映を待つ）
+                setTimeout(async () => {
+                    const { data: { session: s } } = await supabaseClient.auth.getSession();
+                    if (s) await loadProfile(s.access_token);
+                    updateAuthUI();
+                    updatePlanGating();
+                }, 2000);
+            } else if (params.get('checkout') === 'cancel') {
+                window.history.replaceState({}, '', '/');
+            }
+
+            // セッション変化を監視
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                    currentUser = session.user;
+                    await loadProfile(session.access_token);
+                    onAuthReady();
+                } else if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    currentProfile = null;
+                    document.getElementById('login-overlay').classList.remove('hidden');
+                    document.getElementById('auth-bar').classList.remove('visible');
+                }
+            });
+        }
+
+        async function loadProfile(token) {
+            try {
+                const res = await fetch('/api/me', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    currentProfile = await res.json();
+                }
+            } catch (err) {
+                console.error('プロフィール取得エラー:', err);
+            }
+        }
+
+        function onAuthReady() {
+            document.getElementById('login-overlay').classList.add('hidden');
+            updateAuthUI();
+            updatePlanGating();
+        }
+
+        function updateAuthUI() {
+            if (!currentProfile) return;
+
+            const bar = document.getElementById('auth-bar');
+            bar.classList.add('visible');
+
+            const avatar = document.getElementById('auth-avatar');
+            if (currentProfile.avatarUrl) {
+                avatar.src = currentProfile.avatarUrl;
+            } else {
+                avatar.style.display = 'none';
+            }
+
+            document.getElementById('auth-name').textContent = currentProfile.displayName || currentProfile.email;
+
+            const badge = document.getElementById('auth-plan-badge');
+            badge.textContent = currentProfile.plan.toUpperCase();
+            badge.className = 'auth-plan-badge ' + currentProfile.plan;
+
+            // 利用状況
+            const usage = document.getElementById('auth-usage');
+            if (currentProfile.limits.monthlyLimit) {
+                usage.textContent = `${currentProfile.usageCount} / ${currentProfile.limits.monthlyLimit} 回使用`;
+            } else {
+                usage.textContent = '';
+            }
+
+            // ボタン表示
+            const upgradeBtn = document.getElementById('auth-upgrade-btn');
+            const manageBtn = document.getElementById('auth-manage-btn');
+            if (currentProfile.plan === 'pro') {
+                upgradeBtn.style.display = 'none';
+                manageBtn.style.display = '';
+            } else if (currentProfile.plan === 'plus') {
+                upgradeBtn.textContent = 'Proにアップグレード';
+                upgradeBtn.style.display = '';
+                manageBtn.style.display = '';
+            } else {
+                upgradeBtn.textContent = 'アップグレード';
+                upgradeBtn.style.display = '';
+                manageBtn.style.display = 'none';
+            }
+        }
+
+        function updatePlanGating() {
+            if (!currentProfile) return;
+
+            const plan = currentProfile.plan;
+            const steps = currentProfile.limits.steps;
+
+            // Step 2 ロック
+            const step2Lock = document.getElementById('step2-lock');
+            if (steps.includes(2)) {
+                step2Lock.classList.remove('visible');
+            } else {
+                step2Lock.classList.add('visible');
+            }
+
+            // Step 3 ロック
+            const step3Lock = document.getElementById('step3-lock');
+            if (steps.includes(3)) {
+                step3Lock.classList.remove('visible');
+            } else {
+                step3Lock.classList.add('visible');
+            }
+        }
+
+        // ==================== 認証アクション ====================
+
+        async function loginWithGoogle() {
+            if (!supabaseClient) return;
+            const { error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: { redirectTo: window.location.origin }
+            });
+            if (error) {
+                console.error('ログインエラー:', error);
+                showToast('ログインに失敗しました');
+            }
+        }
+
+        async function logout() {
+            if (!supabaseClient) return;
+            await supabaseClient.auth.signOut();
+            currentUser = null;
+            currentProfile = null;
+            document.getElementById('auth-bar').classList.remove('visible');
+            document.getElementById('login-overlay').classList.remove('hidden');
+        }
+
+        // ==================== authFetch ====================
+
+        async function authFetch(url, options = {}) {
+            if (!supabaseClient) {
+                // Supabase未設定 → 通常のfetch（開発用）
+                return fetch(url, options);
+            }
+
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                document.getElementById('login-overlay').classList.remove('hidden');
+                throw new Error('ログインが必要です');
+            }
+
+            const headers = { ...options.headers, 'Authorization': `Bearer ${session.access_token}` };
+            return fetch(url, { ...options, headers });
+        }
+
+        // ==================== 料金モーダル ====================
+
+        function openPricing() {
+            renderPricingCards();
+            document.getElementById('pricing-overlay').classList.add('visible');
+        }
+
+        function closePricing() {
+            document.getElementById('pricing-overlay').classList.remove('visible');
+        }
+
+        function toggleBilling() {
+            billingYearly = !billingYearly;
+            const toggle = document.getElementById('billing-toggle');
+            toggle.classList.toggle('yearly', billingYearly);
+            document.getElementById('billing-monthly-label').classList.toggle('active', !billingYearly);
+            document.getElementById('billing-yearly-label').classList.toggle('active', billingYearly);
+            renderPricingCards();
+        }
+
+        function renderPricingCards() {
+            const currentPlan = currentProfile ? currentProfile.plan : 'free';
+            const container = document.getElementById('pricing-cards');
+
+            const plans = [
+                {
+                    id: 'free',
+                    name: 'Free',
+                    monthlyPrice: 0,
+                    yearlyPrice: 0,
+                    features: ['Step 1（SRT変換）', '話者2人まで', '月3回まで']
+                },
+                {
+                    id: 'plus',
+                    name: 'Plus',
+                    monthlyPrice: 480,
+                    yearlyPrice: 4800,
+                    priceId: billingYearly ? window.__STRIPE_PLUS_YEARLY__ : window.__STRIPE_PLUS_MONTHLY__,
+                    features: ['Step 1 + Step 2', '話者数無制限', '月10回まで']
+                },
+                {
+                    id: 'pro',
+                    name: 'Pro',
+                    monthlyPrice: 980,
+                    yearlyPrice: 9800,
+                    priceId: billingYearly ? window.__STRIPE_PRO_YEARLY__ : window.__STRIPE_PRO_MONTHLY__,
+                    features: ['全Step利用可', '話者数無制限', '回数無制限']
+                }
+            ];
+
+            container.innerHTML = plans.map(plan => {
+                const price = billingYearly ? plan.yearlyPrice : plan.monthlyPrice;
+                const period = billingYearly ? '年' : '月';
+                const isCurrent = plan.id === currentPlan;
+                const isDowngrade = (currentPlan === 'pro' && plan.id !== 'pro') || (currentPlan === 'plus' && plan.id === 'free');
+
+                let btnHtml;
+                if (isCurrent) {
+                    btnHtml = `<button class="pricing-card-btn current">現在のプラン</button>`;
+                } else if (plan.id === 'free') {
+                    btnHtml = `<button class="pricing-card-btn current" disabled>-</button>`;
+                } else if (isDowngrade) {
+                    btnHtml = `<button class="pricing-card-btn current" disabled>-</button>`;
+                } else {
+                    btnHtml = `<button class="pricing-card-btn upgrade" onclick="startCheckout('${plan.priceId}')">アップグレード</button>`;
+                }
+
+                return `
+                    <div class="pricing-card ${isCurrent ? 'current' : ''}">
+                        <div class="pricing-card-name">${plan.name}</div>
+                        <div class="pricing-card-price">${price === 0 ? '無料' : '¥' + price.toLocaleString()}<span>${price > 0 ? ' / ' + period : ''}</span></div>
+                        <div class="pricing-card-billing">${billingYearly && price > 0 ? '¥' + Math.round(plan.yearlyPrice / 12).toLocaleString() + '/月 相当' : ''}</div>
+                        <ul class="pricing-card-features">
+                            ${plan.features.map(f => `<li>${f}</li>`).join('')}
+                        </ul>
+                        ${btnHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function startCheckout(priceId) {
+            if (!priceId) {
+                showToast('価格設定がまだ完了していません');
+                return;
+            }
+
+            try {
+                const res = await authFetch('/api/stripe/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ priceId })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                window.location.href = data.url;
+            } catch (err) {
+                showToast('チェックアウトの開始に失敗しました');
+                console.error(err);
+            }
+        }
+
+        async function openPortal() {
+            try {
+                const res = await authFetch('/api/stripe/portal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                window.location.href = data.url;
+            } catch (err) {
+                showToast('契約管理ページを開けませんでした');
+                console.error(err);
+            }
+        }
+
+        // 料金モーダル外クリックで閉じる
+        document.getElementById('pricing-overlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closePricing();
+        });
 
         // ==================== 準備ガイド ====================
 
@@ -1331,13 +2128,21 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
             hideNext('step1-next');
 
             try {
-                const res = await fetch('/api/step1/convert', {
+                const res = await authFetch('/api/step1/convert', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text: input })
                 });
 
                 const data = await res.json();
+                if (res.status === 403 && data.requiredPlan) {
+                    openPricing();
+                    throw new Error(data.error);
+                }
+                if (res.status === 429) {
+                    openPricing();
+                    throw new Error(data.error);
+                }
                 if (!res.ok) throw new Error(data.error || '変換に失敗しました');
 
                 document.getElementById('step1-output').value = data.srt;
@@ -1374,13 +2179,21 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
             hideNext('step2-next');
 
             try {
-                const res = await fetch('/api/step2/edit', {
+                const res = await authFetch('/api/step2/edit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ srt: input })
                 });
 
                 const data = await res.json();
+                if (res.status === 403 && data.requiredPlan) {
+                    openPricing();
+                    throw new Error(data.error);
+                }
+                if (res.status === 429) {
+                    openPricing();
+                    throw new Error(data.error);
+                }
                 if (!res.ok) throw new Error(data.error || '編集に失敗しました');
 
                 document.getElementById('step2-output').value = data.srt;
@@ -1421,13 +2234,21 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
             hideResult('step3-result');
 
             try {
-                const res = await fetch('/api/step3/split', {
+                const res = await authFetch('/api/step3/split', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ srt: input })
                 });
 
                 const data = await res.json();
+                if (res.status === 403 && data.requiredPlan) {
+                    openPricing();
+                    throw new Error(data.error);
+                }
+                if (res.status === 429) {
+                    openPricing();
+                    throw new Error(data.error);
+                }
                 if (!res.ok) throw new Error(data.error || '分割に失敗しました');
 
                 speakerData = data.speakers;
