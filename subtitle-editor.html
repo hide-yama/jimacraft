@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jimacraft</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        h1 {
+            text-align: center;
+            color: #222;
+            margin-bottom: 10px;
+            font-size: 2.6em;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+        }
+
+        .subtitle-header {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        /* ステップセクション */
+        .step-section {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: box-shadow 0.3s;
+        }
+
+        .step-section:hover {
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .step-number {
+            background: #333;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1em;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* テキストエリア */
+        textarea {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+        }
+
+        /* ボタン */
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #333;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #555;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #e0e0e0;
+        }
+
+        .btn-success {
+            background: #444;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #333;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        /* 統計情報 */
+        .stats {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin-top: 12px;
+            font-size: 0.9em;
+            color: #555;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-label {
+            color: #888;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* マーカー説明 */
+        .marker-help {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 14px;
+            font-size: 0.88em;
+            line-height: 1.8;
+        }
+
+        .marker-help code {
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Consolas, monospace;
+            font-weight: bold;
+        }
+
+        /* 結果表示 */
+        .result-area {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .result-area.visible {
+            display: block;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+            font-size: 0.9em;
+        }
+
+        /* 進むボタン */
+        .next-step-btn {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .next-step-btn.visible {
+            display: block;
+        }
+
+        /* 話者タブ */
+        .speaker-tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 0;
+            flex-wrap: wrap;
+        }
+
+        .speaker-tab {
+            padding: 8px 18px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .speaker-tab.active {
+            background: white;
+            border-color: #333;
+            border-bottom: 2px solid white;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: -1px;
+        }
+
+        .speaker-tab .count-badge {
+            background: #eee;
+            color: #666;
+            padding: 1px 7px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+
+        .speaker-tab.active .count-badge {
+            background: #333;
+            color: white;
+        }
+
+        .speaker-content {
+            border: 1px solid #ddd;
+            border-radius: 0 8px 8px 8px;
+            padding: 15px;
+        }
+
+        .speaker-srt {
+            display: none;
+        }
+
+        .speaker-srt.active {
+            display: block;
+        }
+
+        /* ローディング */
+        .loading {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            color: #333;
+        }
+
+        .loading.visible {
+            display: flex;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ddd;
+            border-top-color: #333;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* エラー表示 */
+        .error-msg {
+            display: none;
+            background: #fff3f3;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 0.9em;
+        }
+
+        .error-msg.visible {
+            display: block;
+        }
+
+        /* フッター */
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8em;
+            margin-top: 20px;
+        }
+
+        /* ===== 準備ガイド ===== */
+
+        /* 初期選択カード */
+        .prep-selection {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .prep-selection h2 {
+            font-size: 1.15em;
+            color: #333;
+            margin-bottom: 18px;
+            font-weight: 600;
+        }
+
+        .prep-cards {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .prep-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 140px;
+            max-width: 200px;
+            text-align: center;
+        }
+
+        .prep-card:hover {
+            border-color: #333;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .prep-card.selected {
+            border-color: #333;
+            background: #f5f5f5;
+        }
+
+        .prep-card-icon {
+            margin-bottom: 10px;
+        }
+
+        .prep-card-icon svg {
+            width: 36px;
+            height: 36px;
+            stroke: #555;
+            fill: none;
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .prep-card-title {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .prep-card-desc {
+            color: #888;
+            font-size: 0.8em;
+            margin-top: 4px;
+        }
+
+        /* 選択済みバー（折りたたみ時） */
+        .prep-selected-bar {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px 18px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .prep-selected-bar.visible {
+            display: flex;
+        }
+
+        .prep-selected-bar a {
+            color: #333;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.85em;
+        }
+
+        /* 準備ステップセクション */
+        .prep-step-section {
+            display: none;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            background: #fafafa;
+        }
+
+        .prep-step-section.visible {
+            display: block;
+        }
+
+        .prep-step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .prep-step-badge {
+            background: #666;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .prep-step-title {
+            font-size: 1.15em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* サブステップ */
+        .substep {
+            display: none;
+        }
+
+        .substep.active {
+            display: block;
+        }
+
+        .substep-indicator {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .substep-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: background 0.3s;
+        }
+
+        .substep-dot.active {
+            background: #333;
+        }
+
+        .substep-dot.done {
+            background: #444;
+        }
+
+        .substep-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+
+        /* OS切替タブ */
+        .os-tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 14px;
+        }
+
+        .os-tab {
+            padding: 6px 16px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+
+        .os-tab.active {
+            background: white;
+            border-color: #333;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .os-content {
+            display: none;
+        }
+
+        .os-content.active {
+            display: block;
+        }
+
+        /* コマンドブロック */
+        .cmd-block {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 0.88em;
+            line-height: 1.6;
+            position: relative;
+            margin-bottom: 10px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .cmd-block .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.15);
+            color: #cdd6f4;
+            border: none;
+            border-radius: 5px;
+            padding: 4px 10px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .cmd-block .copy-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .cmd-note {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 6px;
+            margin-bottom: 14px;
+        }
+
+        /* サブステップナビ */
+        .substep-nav {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            justify-content: flex-end;
+        }
+
+        /* 話者入力フォーム */
+        .speaker-form {
+            margin-bottom: 16px;
+        }
+
+        .speaker-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .speaker-row input[type="text"] {
+            flex: 1;
+            min-width: 120px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .speaker-row input[type="text"]:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+        }
+
+        .speaker-row select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9em;
+            background: white;
+        }
+
+        .speaker-row select:focus {
+            outline: none;
+            border-color: #333;
+        }
+
+        .speaker-remove-btn {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            color: #c33;
+            cursor: pointer;
+            padding: 6px 10px;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .speaker-remove-btn:hover {
+            background: #fff3f3;
+            border-color: #fcc;
+        }
+
+        .add-speaker-btn {
+            background: none;
+            border: 1px dashed #bbb;
+            border-radius: 6px;
+            color: #333;
+            cursor: pointer;
+            padding: 8px 16px;
+            font-size: 0.88em;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        .add-speaker-btn:hover {
+            background: #f8f8f8;
+            border-color: #333;
+        }
+
+        .content-desc-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9em;
+            margin-top: 14px;
+        }
+
+        .content-desc-input:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
+        }
+
+        .content-desc-label {
+            font-size: 0.88em;
+            color: #666;
+            margin-top: 14px;
+            margin-bottom: 6px;
+        }
+
+        /* 生成プロンプト表示 */
+        .generated-prompt {
+            display: none;
+            margin-top: 16px;
+        }
+
+        .generated-prompt.visible {
+            display: block;
+        }
+
+        .generated-prompt textarea {
+            background: #f8f9fa;
+            font-size: 0.88em;
+        }
+
+        /* 手順リスト */
+        .guide-steps {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .guide-steps li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.92em;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .guide-step-num {
+            background: #333;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75em;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .guide-link {
+            color: #333;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>jimacraft</h1>
+        <p class="subtitle-header">文字起こしテキストからSRT字幕ファイルを生成</p>
+
+        <!-- ===== 初期選択 ===== -->
+        <div class="prep-selection" id="prep-selection">
+            <h2>まず、お手元にあるものを選んでください</h2>
+            <div class="prep-cards">
+                <div class="prep-card" onclick="selectPrepType('mp4')">
+                    <div class="prep-card-icon"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polygon points="10,8 16,12 10,16"/></svg></div>
+                    <div class="prep-card-title">MP4動画ファイル</div>
+                    <div class="prep-card-desc">まだ変換していない</div>
+                </div>
+                <div class="prep-card" onclick="selectPrepType('mp3')">
+                    <div class="prep-card-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+                    <div class="prep-card-title">MP3音声ファイル</div>
+                    <div class="prep-card-desc">音声は抽出済み</div>
+                </div>
+                <div class="prep-card" onclick="selectPrepType('text')">
+                    <div class="prep-card-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></div>
+                    <div class="prep-card-title">文字起こしテキスト</div>
+                    <div class="prep-card-desc">文字起こし済み</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 選択済みバー -->
+        <div class="prep-selected-bar" id="prep-selected-bar">
+            <span id="prep-selected-label"></span>
+            <a onclick="resetPrepSelection()">選び直す</a>
+        </div>
+
+        <!-- ===== 準備1: MP4→MP3変換ガイド ===== -->
+        <div class="prep-step-section" id="prep1-section">
+            <div class="prep-step-header">
+                <div class="prep-step-badge">準備 1</div>
+                <div class="prep-step-title">MP4 → MP3 変換</div>
+            </div>
+
+            <div class="substep-indicator" id="prep1-indicator">
+                <div class="substep-dot active"></div>
+                <div class="substep-dot"></div>
+                <div class="substep-dot"></div>
+            </div>
+
+            <!-- サブステップ 1-1: ffmpegインストール -->
+            <div class="substep active" data-prep="1" data-substep="0">
+                <div class="substep-label">ffmpeg のインストール確認</div>
+
+                <div class="os-tabs">
+                    <div class="os-tab active" onclick="switchOS(this, 'mac', 'prep1-install')">Mac</div>
+                    <div class="os-tab" onclick="switchOS(this, 'win', 'prep1-install')">Windows</div>
+                </div>
+
+                <div id="prep1-install-mac" class="os-content active">
+                    <p style="font-size:0.9em;color:#555;margin-bottom:8px;">ターミナルで以下を実行してください:</p>
+                    <div class="cmd-block" id="cmd-brew-ffmpeg">brew install ffmpeg<button class="copy-btn" onclick="copyCmd('cmd-brew-ffmpeg')">コピー</button></div>
+                    <div class="cmd-note">Homebrew がない場合は先に <code>brew</code> をインストールしてください。</div>
+                </div>
+
+                <div id="prep1-install-win" class="os-content">
+                    <p style="font-size:0.9em;color:#555;margin-bottom:8px;">コマンドプロンプトまたはPowerShellで以下を実行してください:</p>
+                    <div class="cmd-block" id="cmd-winget-ffmpeg">winget install ffmpeg<button class="copy-btn" onclick="copyCmd('cmd-winget-ffmpeg')">コピー</button></div>
+                    <div class="cmd-note">または <a href="https://ffmpeg.org/download.html" target="_blank" rel="noopener" class="guide-link">公式サイト</a> からダウンロードしてPATHを通してください。</div>
+                </div>
+
+                <div class="substep-nav">
+                    <button class="btn btn-primary" onclick="nextSubstep('prep1', 1)">次へ →</button>
+                </div>
+            </div>
+
+            <!-- サブステップ 1-2: 変換コマンド -->
+            <div class="substep" data-prep="1" data-substep="1">
+                <div class="substep-label">変換コマンドの実行</div>
+
+                <div class="os-tabs">
+                    <div class="os-tab active" onclick="switchOS(this, 'mac', 'prep1-convert')">Mac</div>
+                    <div class="os-tab" onclick="switchOS(this, 'win', 'prep1-convert')">Windows</div>
+                </div>
+
+                <div id="prep1-convert-mac" class="os-content active">
+                    <p style="font-size:0.9em;color:#555;margin-bottom:8px;">動画ファイルがあるフォルダで実行:</p>
+                    <div class="cmd-block" id="cmd-convert-mac">ffmpeg -i input.mp4 -vn -acodec libmp3lame -q:a 2 output.mp3<button class="copy-btn" onclick="copyCmd('cmd-convert-mac')">コピー</button></div>
+                </div>
+
+                <div id="prep1-convert-win" class="os-content">
+                    <p style="font-size:0.9em;color:#555;margin-bottom:8px;">動画ファイルがあるフォルダで実行:</p>
+                    <div class="cmd-block" id="cmd-convert-win">ffmpeg -i input.mp4 -vn -acodec libmp3lame -q:a 2 output.mp3<button class="copy-btn" onclick="copyCmd('cmd-convert-win')">コピー</button></div>
+                </div>
+
+                <div class="cmd-note"><code>input.mp4</code> と <code>output.mp3</code> は自分のファイル名に置き換えてください。</div>
+
+                <div class="substep-nav">
+                    <button class="btn btn-secondary" onclick="prevSubstep('prep1', 0)">← 戻る</button>
+                    <button class="btn btn-primary" onclick="nextSubstep('prep1', 2)">次へ →</button>
+                </div>
+            </div>
+
+            <!-- サブステップ 1-3: 完了確認 -->
+            <div class="substep" data-prep="1" data-substep="2">
+                <div class="substep-label">MP3ファイルができましたか？</div>
+                <p style="font-size:0.92em;color:#555;margin-bottom:16px;">変換が完了したら、次のステップで文字起こしを行います。</p>
+
+                <div class="substep-nav">
+                    <button class="btn btn-secondary" onclick="prevSubstep('prep1', 1)">← 戻る</button>
+                    <button class="btn btn-primary" onclick="completePrepStep('prep1')">次のステップへ →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 準備2: 文字起こしプロンプト生成 ===== -->
+        <div class="prep-step-section" id="prep2-section">
+            <div class="prep-step-header">
+                <div class="prep-step-badge">準備 2</div>
+                <div class="prep-step-title">文字起こし（AI Studio用プロンプト生成）</div>
+            </div>
+
+            <div class="substep-indicator" id="prep2-indicator">
+                <div class="substep-dot active"></div>
+                <div class="substep-dot"></div>
+                <div class="substep-dot"></div>
+            </div>
+
+            <!-- サブステップ 2-1: 話者情報入力 -->
+            <div class="substep active" data-prep="2" data-substep="0">
+                <div class="substep-label">話者情報を入力</div>
+
+                <div class="speaker-form" id="speaker-form">
+                    <div class="speaker-row" data-speaker-idx="0">
+                        <input type="text" placeholder="話者名（例: 山田花子）" class="speaker-name-input">
+                        <select class="speaker-gender-select">
+                            <option value="男性">男性</option>
+                            <option value="女性">女性</option>
+                            <option value="不特定">不特定</option>
+                        </select>
+                        <button class="speaker-remove-btn" onclick="removeSpeakerRow(this)" title="削除">&times;</button>
+                    </div>
+                </div>
+                <button class="add-speaker-btn" onclick="addSpeakerRow()">＋ 話者を追加</button>
+
+                <div class="content-desc-label">内容の説明（任意）</div>
+                <input type="text" class="content-desc-input" id="content-desc" placeholder="例: バラエティ番組の対談">
+
+                <div class="substep-nav">
+                    <button class="btn btn-primary" onclick="nextSubstep('prep2', 1)">次へ →</button>
+                </div>
+            </div>
+
+            <!-- サブステップ 2-2: プロンプト生成 -->
+            <div class="substep" data-prep="2" data-substep="1">
+                <div class="substep-label">プロンプトを生成してコピー</div>
+
+                <button class="btn btn-primary" onclick="generatePrompt()">プロンプトを生成</button>
+
+                <div class="generated-prompt" id="generated-prompt">
+                    <textarea id="prompt-output" rows="14" readonly></textarea>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="copyText('prompt-output')">プロンプトをコピー</button>
+                    </div>
+                </div>
+
+                <div class="substep-nav">
+                    <button class="btn btn-secondary" onclick="prevSubstep('prep2', 0)">← 戻る</button>
+                    <button class="btn btn-primary" onclick="nextSubstep('prep2', 2)">次へ →</button>
+                </div>
+            </div>
+
+            <!-- サブステップ 2-3: AI Studio手順 -->
+            <div class="substep" data-prep="2" data-substep="2">
+                <div class="substep-label">Google AI Studio で文字起こし</div>
+
+                <p style="font-size:0.92em;color:#555;margin-bottom:14px;">
+                    <a href="https://aistudio.google.com/" target="_blank" rel="noopener" class="guide-link">Google AI Studio を開く</a>
+                </p>
+
+                <ol class="guide-steps">
+                    <li><span class="guide-step-num">1</span><span>MP3ファイルをアップロード</span></li>
+                    <li><span class="guide-step-num">2</span><span>先ほどコピーしたプロンプトを貼り付け</span></li>
+                    <li><span class="guide-step-num">3</span><span>実行して結果を待つ</span></li>
+                    <li><span class="guide-step-num">4</span><span>文字起こし結果をコピー</span></li>
+                </ol>
+
+                <div class="substep-nav">
+                    <button class="btn btn-secondary" onclick="prevSubstep('prep2', 1)">← 戻る</button>
+                    <button class="btn btn-primary" onclick="completePrepStep('prep2')">文字起こしが完了したら次へ →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== STEP 1 ===== -->
+        <div class="step-section" id="step1-section">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">文字起こし → SRT変換</div>
+            </div>
+
+            <textarea id="step1-input" rows="12" placeholder="文字起こしテキストを貼り付けてください&#10;&#10;例:&#10;山田花子（女性）: [0:00] 今日はよろしくお願いします。&#10;鈴木太郎（男性）: [0:05] こちらこそよろしくお願いします。"></textarea>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="step1-btn" onclick="runStep1()">SRTに変換</button>
+            </div>
+
+            <div class="loading" id="step1-loading">
+                <div class="spinner"></div>
+                <span>変換中...</span>
+            </div>
+
+            <div class="error-msg" id="step1-error"></div>
+
+            <div class="result-area" id="step1-result">
+                <div class="stats" id="step1-stats"></div>
+                <div class="result-label" style="margin-top: 12px;">生成されたSRT:</div>
+                <textarea id="step1-output" rows="10" readonly></textarea>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="downloadText('step1-output', '字幕.srt')">SRTダウンロード</button>
+                    <button class="btn btn-secondary" onclick="copyText('step1-output')">コピー</button>
+                </div>
+            </div>
+
+            <div class="next-step-btn" id="step1-next">
+                <button class="btn btn-primary" onclick="goToStep2()">Step 2 へ進む →</button>
+            </div>
+        </div>
+
+        <!-- ===== STEP 2 ===== -->
+        <div class="step-section" id="step2-section">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title">マーカー編集</div>
+            </div>
+
+            <div class="marker-help">
+                <strong>編集マーカー:</strong><br>
+                <code>/</code> 分割 - その位置で字幕を2つに分ける<br>
+                <code>-</code> 結合 - 行末に付けると同じ話者の次の字幕と結合<br>
+                <code>x</code> 削除 - 行頭に付けるとその字幕を削除<br>
+                <small style="color: #999;">処理順: 削除 → 結合 → 分割</small>
+            </div>
+
+            <textarea id="step2-input" rows="14" placeholder="Step1の結果がここに入ります。マーカーを追加して編集してください。"></textarea>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="step2-btn" onclick="runStep2()">編集を実行</button>
+            </div>
+
+            <div class="loading" id="step2-loading">
+                <div class="spinner"></div>
+                <span>編集処理中...</span>
+            </div>
+
+            <div class="error-msg" id="step2-error"></div>
+
+            <div class="result-area" id="step2-result">
+                <div class="stats" id="step2-stats"></div>
+                <div class="result-label" style="margin-top: 12px;">編集後のSRT:</div>
+                <textarea id="step2-output" rows="10" readonly></textarea>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="downloadText('step2-output', '字幕_編集済み.srt')">SRTダウンロード</button>
+                    <button class="btn btn-secondary" onclick="copyText('step2-output')">コピー</button>
+                </div>
+            </div>
+
+            <div class="next-step-btn" id="step2-next">
+                <button class="btn btn-primary" onclick="goToStep3()">Step 3 へ進む →</button>
+            </div>
+        </div>
+
+        <!-- ===== STEP 3 ===== -->
+        <div class="step-section" id="step3-section">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title">話者別分割</div>
+            </div>
+
+            <textarea id="step3-input" rows="10" placeholder="Step2の結果がここに入ります。" readonly></textarea>
+
+            <div class="btn-group">
+                <button class="btn btn-primary" id="step3-btn" onclick="runStep3()">話者別に分割</button>
+            </div>
+
+            <div class="loading" id="step3-loading">
+                <div class="spinner"></div>
+                <span>分割処理中...</span>
+            </div>
+
+            <div class="error-msg" id="step3-error"></div>
+
+            <div class="result-area" id="step3-result">
+                <div class="stats" id="step3-stats"></div>
+                <div class="speaker-tabs" id="speaker-tabs"></div>
+                <div class="speaker-content" id="speaker-content"></div>
+                <div class="btn-group" style="margin-top: 15px;">
+                    <button class="btn btn-success" onclick="downloadAllSpeakers()">全てダウンロード</button>
+                </div>
+            </div>
+
+            <div class="next-step-btn" id="step3-next">
+                <button class="btn btn-primary" onclick="goToPremiere()">Premiere Pro へのインポート方法 →</button>
+            </div>
+        </div>
+
+        <!-- ===== Premiere Pro インポートガイド ===== -->
+        <div class="step-section" id="premiere-section">
+            <div class="step-header">
+                <div class="step-number" style="background: #333;">P</div>
+                <div class="step-title">Premiere Pro に字幕をインポート</div>
+            </div>
+
+            <div class="marker-help" style="background:#f8f8f8;border-color:#ddd;">
+                <strong>SRTファイルのインポート手順</strong><br>
+                ダウンロードしたSRTファイルをPremiere Proのプロジェクトに読み込みます。
+            </div>
+
+            <ol class="guide-steps">
+                <li>
+                    <span class="guide-step-num">1</span>
+                    <span>Premiere Pro でプロジェクトを開き、字幕を入れたいシーケンスを表示</span>
+                </li>
+                <li>
+                    <span class="guide-step-num">2</span>
+                    <span><strong>ファイル → 読み込み</strong>（Ctrl+I / Cmd+I）でSRTファイルを選択</span>
+                </li>
+                <li>
+                    <span class="guide-step-num">3</span>
+                    <span>プロジェクトパネルに読み込まれたSRTファイルを<strong>タイムラインにドラッグ&ドロップ</strong></span>
+                </li>
+                <li>
+                    <span class="guide-step-num">4</span>
+                    <span>キャプショントラックが自動生成され、字幕が配置される</span>
+                </li>
+            </ol>
+
+            <div style="margin-top:18px;margin-bottom:10px;font-weight:600;color:#555;font-size:0.95em;">話者別SRTを使う場合</div>
+            <ol class="guide-steps">
+                <li>
+                    <span class="guide-step-num">1</span>
+                    <span>話者ごとのSRTファイルをそれぞれ読み込み</span>
+                </li>
+                <li>
+                    <span class="guide-step-num">2</span>
+                    <span>各SRTを別々のキャプショントラックにドラッグ（トラックが自動追加される）</span>
+                </li>
+                <li>
+                    <span class="guide-step-num">3</span>
+                    <span><strong>プロパティパネル</strong>で話者ごとにフォント・色・位置を設定</span>
+                </li>
+            </ol>
+
+            <div style="margin-top:18px;margin-bottom:10px;font-weight:600;color:#555;font-size:0.95em;">字幕のスタイル調整（プロパティパネル）</div>
+            <ol class="guide-steps">
+                <li>
+                    <span class="guide-step-num">1</span>
+                    <span>画面上部のメニューバーから <strong>ウィンドウ → プロパティ</strong> をクリック</span>
+                </li>
+                <li>
+                    <span class="guide-step-num">2</span>
+                    <span>画面右側にプロパティパネルが表示される</span>
+                </li>
+                <li>
+                    <span class="guide-step-num">3</span>
+                    <span>タイムライン上の<strong>字幕クリップをクリック</strong>して選択（青くハイライトされる）</span>
+                </li>
+                <li>
+                    <span class="guide-step-num">4</span>
+                    <span>プロパティパネルに字幕の編集項目が表示されるので、ここでスタイルを変更</span>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="footer">jimacraft</div>
+
+    <script>
+        // グローバル変数
+        let speakerData = {};
+        let prepType = null; // 'mp4' | 'mp3' | 'text'
+
+        // ==================== 準備ガイド ====================
+
+        function selectPrepType(type) {
+            prepType = type;
+
+            // カード選択表示
+            document.querySelectorAll('.prep-card').forEach(c => c.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+
+            // 選択画面を非表示、選択済みバーを表示
+            setTimeout(() => {
+                document.getElementById('prep-selection').style.display = 'none';
+                const bar = document.getElementById('prep-selected-bar');
+                const labels = { mp4: 'MP4動画ファイル', mp3: 'MP3音声ファイル', text: '文字起こしテキスト' };
+                document.getElementById('prep-selected-label').textContent = '選択: ' + labels[type];
+                bar.classList.add('visible');
+
+                // 該当セクション表示
+                if (type === 'mp4') {
+                    document.getElementById('prep1-section').classList.add('visible');
+                    document.getElementById('prep2-section').classList.remove('visible');
+                } else if (type === 'mp3') {
+                    document.getElementById('prep1-section').classList.remove('visible');
+                    document.getElementById('prep2-section').classList.add('visible');
+                } else {
+                    // text: 準備不要、Step1にフォーカス
+                    document.getElementById('prep1-section').classList.remove('visible');
+                    document.getElementById('prep2-section').classList.remove('visible');
+                    document.getElementById('step1-input').focus();
+                    document.getElementById('step1-section').scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 150);
+        }
+
+        function resetPrepSelection() {
+            prepType = null;
+            document.getElementById('prep-selection').style.display = '';
+            document.getElementById('prep-selected-bar').classList.remove('visible');
+            document.getElementById('prep1-section').classList.remove('visible');
+            document.getElementById('prep2-section').classList.remove('visible');
+
+            // カード選択リセット
+            document.querySelectorAll('.prep-card').forEach(c => c.classList.remove('selected'));
+
+            // サブステップリセット
+            resetSubsteps('prep1');
+            resetSubsteps('prep2');
+
+            document.getElementById('prep-selection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // サブステップナビゲーション
+        function nextSubstep(prep, toIndex) {
+            showSubstep(prep, toIndex);
+        }
+
+        function prevSubstep(prep, toIndex) {
+            showSubstep(prep, toIndex);
+        }
+
+        function showSubstep(prep, index) {
+            const section = document.getElementById(`${prep}-section`);
+            const substeps = section.querySelectorAll('.substep');
+            substeps.forEach(s => s.classList.remove('active'));
+            substeps[index].classList.add('active');
+
+            // インジケーター更新
+            const dots = document.getElementById(`${prep}-indicator`).querySelectorAll('.substep-dot');
+            dots.forEach((d, i) => {
+                d.classList.remove('active', 'done');
+                if (i < index) d.classList.add('done');
+                if (i === index) d.classList.add('active');
+            });
+
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetSubsteps(prep) {
+            const section = document.getElementById(`${prep}-section`);
+            const substeps = section.querySelectorAll('.substep');
+            substeps.forEach((s, i) => {
+                s.classList.toggle('active', i === 0);
+            });
+            const dots = document.getElementById(`${prep}-indicator`).querySelectorAll('.substep-dot');
+            dots.forEach((d, i) => {
+                d.classList.remove('done');
+                d.classList.toggle('active', i === 0);
+            });
+        }
+
+        function completePrepStep(prep) {
+            if (prep === 'prep1') {
+                // 準備1完了 → 準備2を表示
+                document.getElementById('prep1-section').classList.remove('visible');
+                document.getElementById('prep2-section').classList.add('visible');
+                document.getElementById('prep2-section').scrollIntoView({ behavior: 'smooth' });
+            } else if (prep === 'prep2') {
+                // 準備2完了 → Step1にフォーカス
+                document.getElementById('prep2-section').classList.remove('visible');
+                document.getElementById('step1-input').focus();
+                document.getElementById('step1-section').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // OS切替
+        function switchOS(tabEl, os, groupId) {
+            // タブ切替
+            const tabs = tabEl.parentElement;
+            tabs.querySelectorAll('.os-tab').forEach(t => t.classList.remove('active'));
+            tabEl.classList.add('active');
+
+            // コンテンツ切替
+            document.getElementById(`${groupId}-mac`).classList.toggle('active', os === 'mac');
+            document.getElementById(`${groupId}-win`).classList.toggle('active', os === 'win');
+        }
+
+        // コマンドコピー
+        function copyCmd(blockId) {
+            const block = document.getElementById(blockId);
+            // ボタンテキストを除いたコマンド部分を取得
+            const text = block.childNodes[0].textContent.trim();
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('コピーしました');
+            });
+        }
+
+        // 話者フォーム
+        function addSpeakerRow() {
+            const form = document.getElementById('speaker-form');
+            const row = document.createElement('div');
+            row.className = 'speaker-row';
+            row.innerHTML = `
+                <input type="text" placeholder="話者名（例: 鈴木太郎）" class="speaker-name-input">
+                <select class="speaker-gender-select">
+                    <option value="男性">男性</option>
+                    <option value="女性">女性</option>
+                    <option value="不特定">不特定</option>
+                </select>
+                <button class="speaker-remove-btn" onclick="removeSpeakerRow(this)" title="削除">&times;</button>
+            `;
+            form.appendChild(row);
+        }
+
+        function removeSpeakerRow(btn) {
+            const form = document.getElementById('speaker-form');
+            if (form.querySelectorAll('.speaker-row').length > 1) {
+                btn.closest('.speaker-row').remove();
+            } else {
+                showToast('話者は最低1人必要です');
+            }
+        }
+
+        // プロンプト生成
+        function generatePrompt() {
+            const rows = document.querySelectorAll('#speaker-form .speaker-row');
+            const speakers = [];
+            rows.forEach(row => {
+                const name = row.querySelector('.speaker-name-input').value.trim();
+                const gender = row.querySelector('.speaker-gender-select').value;
+                if (name) {
+                    speakers.push({ name, gender });
+                }
+            });
+
+            if (speakers.length === 0) {
+                showToast('話者名を1人以上入力してください');
+                return;
+            }
+
+            const contentDesc = document.getElementById('content-desc').value.trim();
+
+            let prompt = `以下の音声ファイルを文字起こししてください。
+
+## 出力形式
+各発言を以下の形式で出力してください：
+話者名（性別）: [分:秒] 発言内容
+
+## 既知の話者
+${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
+
+            if (contentDesc) {
+                prompt += `\n\n## 内容\n${contentDesc}`;
+            }
+
+            prompt += `
+
+## ルール
+- タイムスタンプは [M:SS] 形式（例: [0:00], [1:30], [12:05]）
+- 句読点を適切に使用してください
+- 上記以外の話者が登場した場合は「話者A（不特定）」「話者B（不特定）」のように命名してください
+- 話者の区別が難しい場合も最善の推測で分離してください
+- 相槌や短い反応も省略せず記載してください`;
+
+            document.getElementById('prompt-output').value = prompt;
+            document.getElementById('generated-prompt').classList.add('visible');
+        }
+
+        // ==================== Step 1 ====================
+        async function runStep1() {
+            const input = document.getElementById('step1-input').value;
+            if (!input.trim()) {
+                showError('step1-error', 'テキストを入力してください');
+                return;
+            }
+
+            showLoading('step1');
+            hideError('step1-error');
+            hideResult('step1-result');
+            hideNext('step1-next');
+
+            try {
+                const res = await fetch('/api/step1/convert', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: input })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || '変換に失敗しました');
+
+                document.getElementById('step1-output').value = data.srt;
+                document.getElementById('step1-stats').innerHTML =
+                    `<div class="stat-item"><span class="stat-label">字幕数:</span><span class="stat-value">${data.subtitleCount}</span></div>` +
+                    `<div class="stat-item"><span class="stat-label">話者:</span><span class="stat-value">${data.speakers.join(', ')}</span></div>`;
+
+                showResult('step1-result');
+                showNext('step1-next');
+            } catch (err) {
+                showError('step1-error', err.message);
+            } finally {
+                hideLoading('step1');
+            }
+        }
+
+        function goToStep2() {
+            const srt = document.getElementById('step1-output').value;
+            document.getElementById('step2-input').value = srt;
+            document.getElementById('step2-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ==================== Step 2 ====================
+        async function runStep2() {
+            const input = document.getElementById('step2-input').value;
+            if (!input.trim()) {
+                showError('step2-error', 'SRTテキストを入力してください');
+                return;
+            }
+
+            showLoading('step2');
+            hideError('step2-error');
+            hideResult('step2-result');
+            hideNext('step2-next');
+
+            try {
+                const res = await fetch('/api/step2/edit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ srt: input })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || '編集に失敗しました');
+
+                document.getElementById('step2-output').value = data.srt;
+
+                const ops = data.operations;
+                document.getElementById('step2-stats').innerHTML =
+                    `<div class="stat-item"><span class="stat-label">処理前:</span><span class="stat-value">${data.originalCount}個</span></div>` +
+                    `<div class="stat-item"><span class="stat-label">処理後:</span><span class="stat-value">${data.editedCount}個</span></div>` +
+                    `<div class="stat-item"><span class="stat-label">削除:</span><span class="stat-value">${ops.deleted}</span></div>` +
+                    `<div class="stat-item"><span class="stat-label">結合:</span><span class="stat-value">${ops.merged}</span></div>` +
+                    `<div class="stat-item"><span class="stat-label">分割:</span><span class="stat-value">${ops.split}</span></div>`;
+
+                showResult('step2-result');
+                showNext('step2-next');
+            } catch (err) {
+                showError('step2-error', err.message);
+            } finally {
+                hideLoading('step2');
+            }
+        }
+
+        function goToStep3() {
+            const srt = document.getElementById('step2-output').value;
+            document.getElementById('step3-input').value = srt;
+            document.getElementById('step3-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ==================== Step 3 ====================
+        async function runStep3() {
+            const input = document.getElementById('step3-input').value;
+            if (!input.trim()) {
+                showError('step3-error', 'SRTテキストを入力してください');
+                return;
+            }
+
+            showLoading('step3');
+            hideError('step3-error');
+            hideResult('step3-result');
+
+            try {
+                const res = await fetch('/api/step3/split', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ srt: input })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || '分割に失敗しました');
+
+                speakerData = data.speakers;
+                const speakers = Object.keys(speakerData);
+
+                if (speakers.length === 0) {
+                    throw new Error('話者が見つかりませんでした');
+                }
+
+                // 統計
+                let totalCount = 0;
+                const speakerStats = speakers.map(s => {
+                    totalCount += speakerData[s].count;
+                    return `${s}: ${speakerData[s].count}個`;
+                });
+
+                document.getElementById('step3-stats').innerHTML =
+                    `<div class="stat-item"><span class="stat-label">話者数:</span><span class="stat-value">${speakers.length}</span></div>` +
+                    `<div class="stat-item"><span class="stat-label">合計字幕:</span><span class="stat-value">${totalCount}個</span></div>` +
+                    `<div class="stat-item"><span class="stat-label">内訳:</span><span class="stat-value">${speakerStats.join(' / ')}</span></div>`;
+
+                // タブ生成
+                const tabsEl = document.getElementById('speaker-tabs');
+                const contentEl = document.getElementById('speaker-content');
+                tabsEl.innerHTML = '';
+                contentEl.innerHTML = '';
+
+                speakers.forEach((speaker, idx) => {
+                    // タブ
+                    const tab = document.createElement('div');
+                    tab.className = 'speaker-tab' + (idx === 0 ? ' active' : '');
+                    tab.innerHTML = `${speaker}<span class="count-badge">${speakerData[speaker].count}</span>`;
+                    tab.onclick = () => switchSpeaker(speaker);
+                    tabsEl.appendChild(tab);
+
+                    // コンテンツ
+                    const div = document.createElement('div');
+                    div.className = 'speaker-srt' + (idx === 0 ? ' active' : '');
+                    div.id = `speaker-${speaker}`;
+                    div.innerHTML =
+                        `<textarea rows="10" readonly style="width:100%;font-family:'Courier New',Consolas,monospace;font-size:13px;border:none;resize:vertical;">${escapeHtml(speakerData[speaker].srt)}</textarea>` +
+                        `<div class="btn-group"><button class="btn btn-secondary" onclick="downloadSpeaker('${escapeAttr(speaker)}')">ダウンロード: 字幕_${escapeHtml(speaker)}.srt</button><button class="btn btn-secondary" onclick="copySpeakerSrt('${escapeAttr(speaker)}')">コピー</button></div>`;
+                    contentEl.appendChild(div);
+                });
+
+                showResult('step3-result');
+                showNext('step3-next');
+            } catch (err) {
+                showError('step3-error', err.message);
+            } finally {
+                hideLoading('step3');
+            }
+        }
+
+        function goToPremiere() {
+            document.getElementById('premiere-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function switchSpeaker(speaker) {
+            document.querySelectorAll('.speaker-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.speaker-srt').forEach(s => s.classList.remove('active'));
+
+            // タブをアクティブに
+            const tabs = document.querySelectorAll('.speaker-tab');
+            tabs.forEach(t => {
+                if (t.textContent.startsWith(speaker)) t.classList.add('active');
+            });
+
+            const el = document.getElementById(`speaker-${speaker}`);
+            if (el) el.classList.add('active');
+        }
+
+        function downloadSpeaker(speaker) {
+            if (speakerData[speaker]) {
+                downloadBlob(speakerData[speaker].srt, `字幕_${speaker}.srt`);
+            }
+        }
+
+        function copySpeakerSrt(speaker) {
+            if (speakerData[speaker]) {
+                navigator.clipboard.writeText(speakerData[speaker].srt).then(() => {
+                    showToast('コピーしました');
+                });
+            }
+        }
+
+        function downloadAllSpeakers() {
+            for (const [speaker, data] of Object.entries(speakerData)) {
+                downloadBlob(data.srt, `字幕_${speaker}.srt`);
+            }
+        }
+
+        // ==================== ユーティリティ ====================
+
+        function showLoading(step) {
+            document.getElementById(`${step}-loading`).classList.add('visible');
+            document.getElementById(`${step}-btn`).disabled = true;
+        }
+
+        function hideLoading(step) {
+            document.getElementById(`${step}-loading`).classList.remove('visible');
+            document.getElementById(`${step}-btn`).disabled = false;
+        }
+
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.classList.add('visible');
+        }
+
+        function hideError(id) {
+            document.getElementById(id).classList.remove('visible');
+        }
+
+        function showResult(id) {
+            document.getElementById(id).classList.add('visible');
+        }
+
+        function hideResult(id) {
+            document.getElementById(id).classList.remove('visible');
+        }
+
+        function showNext(id) {
+            document.getElementById(id).classList.add('visible');
+        }
+
+        function hideNext(id) {
+            document.getElementById(id).classList.remove('visible');
+        }
+
+        function downloadText(textareaId, filename) {
+            const text = document.getElementById(textareaId).value;
+            downloadBlob(text, filename);
+        }
+
+        function downloadBlob(text, filename) {
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function copyText(textareaId) {
+            const text = document.getElementById(textareaId).value;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('コピーしました');
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.textContent = msg;
+            toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 24px;border-radius:8px;font-size:0.9em;z-index:9999;opacity:0;transition:opacity 0.3s;';
+            document.body.appendChild(toast);
+            requestAnimationFrame(() => { toast.style.opacity = '1'; });
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 1500);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function escapeAttr(str) {
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        // ==================== ソースコード保護（簡易） ====================
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && (e.key === 's' || e.key === 'u' || e.key === 'S' || e.key === 'U')) {
+                e.preventDefault();
+            }
+            if (e.key === 'F12') {
+                e.preventDefault();
+            }
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

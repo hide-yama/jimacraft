@@ -1,0 +1,23 @@
+# 環境変数
+.env
+
+# 認証情報
+credentials/
+
+# Node.js
+node_modules/
+npm-debug.log
+
+# 一時ファイル
+temp/
+*.tmp
+
+# macOS
+.DS_Store
+
+# メディアファイル
+*.mp3
+*.mp4
+
+# 生成物
+*.srt
