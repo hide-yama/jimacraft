@@ -90,8 +90,14 @@ app.use((req, res) => {
     res.status(404).json({ error: 'Not Found' });
 });
 
-// ==================== サーバー起動 ====================
+// ==================== サーバー起動 / エクスポート ====================
 
-app.listen(PORT, () => {
-    console.log(`字幕エディタサーバー起動: http://localhost:${PORT}`);
-});
+// Vercel: module.exports で Express app をエクスポート
+// ローカル: 直接実行時のみ listen
+if (process.env.VERCEL) {
+    module.exports = app;
+} else {
+    app.listen(PORT, () => {
+        console.log(`字幕エディタサーバー起動: http://localhost:${PORT}`);
+    });
+}

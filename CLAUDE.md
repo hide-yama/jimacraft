@@ -5,8 +5,9 @@
 ## 技術スタック
 
 - フロントエンド: HTML + JavaScript
-- バックエンド: Node.js + Express
-- 文字起こし: OpenAI Whisper API（MP3→テキスト用）
+- バックエンド: Node.js + Express（SRT変換・編集・話者分割のAPI）
+- 文字起こし: ユーザー自身が Google AI Studio で実施（アプリはプロンプト生成を支援）
+- MP4→MP3変換: ユーザーがローカルで ffmpeg コマンドを手動実行（アプリはマニュアルを表示）
 
 ## ファイル構成
 
@@ -14,10 +15,11 @@
 subtitle-editor.html           メインUI（jimacraft）
 subtitle-editor-server.js      字幕エディタ用サーバー
 srt-processor.js               SRT変換・編集・話者分割ロジック
-mp4_to_mp3_with_transcription.html  MP4→MP3変換 + 文字起こしUI
-transcription-server.js        変換・文字起こしサーバー
 package.json                   依存管理
 .env.example                   環境変数テンプレート
+archive/                       旧ファイル（現在未使用）
+  mp4_to_mp3_with_transcription.html  旧: MP4→MP3変換 + 文字起こしUI
+  transcription-server.js             旧: 変換・文字起こしサーバー
 ```
 
 ## 起動方法
@@ -25,9 +27,6 @@ package.json                   依存管理
 ```bash
 # 字幕エディタ（jimacraft）
 npm run subtitle    # → http://localhost:3002
-
-# MP4→MP3変換 + 文字起こし
-npm start           # → http://localhost:3000
 ```
 
 ## jimacraft の機能
@@ -62,6 +61,7 @@ SRTファイルの読み込み手順とプロパティパネルでのスタイ�
 ## 環境変数（.env）
 
 ```
-OPENAI_API_KEY=your_key_here
-PORT=3001
+SUBTITLE_PORT=3002   # デフォルト3002（省略可）
 ```
+
+※ OpenAI APIキーは不要（文字起こしはユーザーが Google AI Studio で実施するため）

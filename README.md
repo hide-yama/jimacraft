@@ -26,20 +26,6 @@ cd jimacraft
 npm install
 ```
 
-### 環境変数
-
-`.env.example` をコピーして `.env` を作成:
-
-```bash
-cp .env.example .env
-```
-
-`.env` に OpenAI API キーを設定:
-
-```
-OPENAI_API_KEY=your_key_here
-```
-
 ## 起動
 
 ```bash
