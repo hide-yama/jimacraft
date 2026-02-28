@@ -103,6 +103,9 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
 
 // ==================== 通常ミドルウェア ====================
 
+// 静的ファイル配信（public/）
+app.use(express.static(path.join(__dirname, 'public')));
+
 // JSON body parser（5MB上限）
 app.use(express.json({ limit: '5mb' }));
 
