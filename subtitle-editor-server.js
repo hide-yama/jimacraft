@@ -141,7 +141,7 @@ app.get('/api/me', authMiddleware, (req, res) => {
 
 // ==================== Stripe API ====================
 
-// Checkout セッション作成
+// Checkout セッション作成（新規）/ サブスクリプション変更（既存）
 app.post('/api/stripe/checkout', authMiddleware, async (req, res) => {
     if (!stripe) {
         return res.status(500).json({ error: 'Stripeが設定されていません' });
@@ -170,18 +170,46 @@ app.post('/api/stripe/checkout', authMiddleware, async (req, res) => {
                 .eq('id', profile.id);
         }
 
-        const origin = req.headers.origin || `http://localhost:${PORT}`;
-        const session = await stripe.checkout.sessions.create({
+        // 既存のアクティブなサブスクリプションを確認
+        const subscriptions = await stripe.subscriptions.list({
             customer: customerId,
-            payment_method_types: ['card'],
-            mode: 'subscription',
-            line_items: [{ price: priceId, quantity: 1 }],
-            success_url: `${origin}/?checkout=success`,
-            cancel_url: `${origin}/?checkout=cancel`,
-            allow_promotion_codes: true
+            status: 'active',
+            limit: 1
         });
 
-        res.json({ url: session.url });
+        if (subscriptions.data.length > 0) {
+            // 既存サブスクリプションがある場合 → プラン変更（日割り精算）
+            const currentSub = subscriptions.data[0];
+            const updatedSub = await stripe.subscriptions.update(currentSub.id, {
+                items: [{
+                    id: currentSub.items.data[0].id,
+                    price: priceId
+                }],
+                proration_behavior: 'create_prorations'
+            });
+
+            const plan = priceIdToPlan(priceId);
+            await supabase
+                .from('profiles')
+                .update({ plan, updated_at: new Date().toISOString() })
+                .eq('stripe_customer_id', customerId);
+
+            res.json({ updated: true, plan });
+        } else {
+            // 新規サブスクリプション → Checkoutセッション作成
+            const origin = req.headers.origin || `http://localhost:${PORT}`;
+            const session = await stripe.checkout.sessions.create({
+                customer: customerId,
+                payment_method_types: ['card'],
+                mode: 'subscription',
+                line_items: [{ price: priceId, quantity: 1 }],
+                success_url: `${origin}/?checkout=success`,
+                cancel_url: `${origin}/?checkout=cancel`,
+                allow_promotion_codes: true
+            });
+
+            res.json({ url: session.url });
+        }
     } catch (err) {
         console.error('Checkout作成エラー:', err);
         res.status(500).json({ error: 'Checkoutセッション作成に失敗しました' });

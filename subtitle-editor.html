@@ -1903,7 +1903,15 @@
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error);
 
-                window.location.href = data.url;
+                if (data.updated) {
+                    // 既存サブスクリプションのプラン変更完了
+                    showToast(`${data.plan === 'pro' ? 'Pro' : 'Plus'}プランに変更しました`);
+                    closePricing();
+                    await loadProfile();
+                } else {
+                    // 新規サブスクリプション → Checkoutページへ
+                    window.location.href = data.url;
+                }
             } catch (err) {
                 showToast('チェックアウトの開始に失敗しました');
                 console.error(err);
