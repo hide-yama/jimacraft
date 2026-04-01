@@ -1920,8 +1920,11 @@
                 if (data.updated) {
                     // 既存サブスクリプションのプラン変更完了
                     showToast(`${data.plan === 'pro' ? 'Pro' : 'Plus'}プランに変更しました`);
-                    closePricing();
-                    await loadProfile();
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    if (session) await loadProfile(session.access_token);
+                    updateAuthUI();
+                    updatePlanGating();
+                    renderPricingCards();
                 } else {
                     // 新規サブスクリプション → Checkoutページへ
                     window.location.href = data.url;
@@ -1947,8 +1950,11 @@
                 if (!res.ok) throw new Error(data.error);
 
                 showToast('サブスクリプションのキャンセルを受け付けました');
-                closePricing();
-                await loadProfile();
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) await loadProfile(session.access_token);
+                updateAuthUI();
+                updatePlanGating();
+                renderPricingCards();
             } catch (err) {
                 showToast('キャンセルに失敗しました');
                 console.error(err);
