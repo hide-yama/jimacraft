@@ -1182,6 +1182,17 @@
         .pricing-card-btn.upgrade:hover {
             background: var(--accent-hover);
         }
+
+        .pricing-card-btn.downgrade {
+            background: white;
+            color: #666;
+            border: 1px solid #ccc;
+        }
+
+        .pricing-card-btn.downgrade:hover {
+            background: #f5f5f5;
+            border-color: #999;
+        }
     </style>
 </head>
 <body>
@@ -1865,10 +1876,12 @@
                 let btnHtml;
                 if (isCurrent) {
                     btnHtml = `<button class="pricing-card-btn current">現在のプラン</button>`;
+                } else if (plan.id === 'free' && currentPlan !== 'free') {
+                    btnHtml = `<button class="pricing-card-btn downgrade" onclick="cancelSubscription()">Freeに戻す</button>`;
                 } else if (plan.id === 'free') {
                     btnHtml = `<button class="pricing-card-btn current" disabled>-</button>`;
                 } else if (isDowngrade) {
-                    btnHtml = `<button class="pricing-card-btn current" disabled>-</button>`;
+                    btnHtml = `<button class="pricing-card-btn downgrade" onclick="startCheckout('${plan.priceId}')">ダウングレード</button>`;
                 } else {
                     btnHtml = `<button class="pricing-card-btn upgrade" onclick="startCheckout('${plan.priceId}')">アップグレード</button>`;
                 }
@@ -1914,6 +1927,29 @@
                 }
             } catch (err) {
                 showToast('チェックアウトの開始に失敗しました');
+                console.error(err);
+            }
+        }
+
+        async function cancelSubscription() {
+            if (!confirm('サブスクリプションをキャンセルしますか？\n現在の請求期間が終了するまでは引き続きご利用いただけます。')) {
+                return;
+            }
+
+            try {
+                const res = await authFetch('/api/stripe/cancel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+
+                showToast('サブスクリプションのキャンセルを受け付けました');
+                closePricing();
+                await loadProfile();
+            } catch (err) {
+                showToast('キャンセルに失敗しました');
                 console.error(err);
             }
         }

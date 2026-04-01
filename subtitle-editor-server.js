@@ -216,6 +216,40 @@ app.post('/api/stripe/checkout', authMiddleware, async (req, res) => {
     }
 });
 
+// サブスクリプションキャンセル（期間終了時）
+app.post('/api/stripe/cancel', authMiddleware, async (req, res) => {
+    if (!stripe) {
+        return res.status(500).json({ error: 'Stripeが設定されていません' });
+    }
+
+    const profile = req.profile;
+    if (!profile.stripe_customer_id) {
+        return res.status(400).json({ error: 'サブスクリプションがありません' });
+    }
+
+    try {
+        const subscriptions = await stripe.subscriptions.list({
+            customer: profile.stripe_customer_id,
+            status: 'active',
+            limit: 1
+        });
+
+        if (subscriptions.data.length === 0) {
+            return res.status(400).json({ error: 'アクティブなサブスクリプションがありません' });
+        }
+
+        // 期間終了時にキャンセル（即時キャンセルではない）
+        await stripe.subscriptions.update(subscriptions.data[0].id, {
+            cancel_at_period_end: true
+        });
+
+        res.json({ canceled: true });
+    } catch (err) {
+        console.error('キャンセルエラー:', err);
+        res.status(500).json({ error: 'キャンセルに失敗しました' });
+    }
+});
+
 // Customer Portal セッション作成
 app.post('/api/stripe/portal', authMiddleware, async (req, res) => {
     if (!stripe) {
