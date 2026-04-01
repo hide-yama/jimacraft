@@ -239,12 +239,13 @@ app.post('/api/stripe/cancel', authMiddleware, async (req, res) => {
         }
 
         // 期間終了時にキャンセル（即時キャンセルではない）
-        const sub = subscriptions.data[0];
-        await stripe.subscriptions.update(sub.id, {
+        const updatedSub = await stripe.subscriptions.update(subscriptions.data[0].id, {
             cancel_at_period_end: true
         });
 
-        const periodEnd = new Date(sub.current_period_end * 1000).toISOString();
+        // update のレスポンスから期間終了日を取得
+        const periodEndSec = updatedSub.current_period_end;
+        const periodEnd = periodEndSec ? new Date(periodEndSec * 1000).toISOString() : null;
         res.json({ canceled: true, periodEnd });
     } catch (err) {
         console.error('キャンセルエラー:', err);

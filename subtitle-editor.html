@@ -1949,9 +1949,13 @@
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error);
 
-                const endDate = new Date(data.periodEnd);
-                const dateStr = `${endDate.getFullYear()}/${endDate.getMonth() + 1}/${endDate.getDate()}`;
-                showToast(`キャンセルを受け付けました。${dateStr} まで現在のプランをご利用いただけます`);
+                if (data.periodEnd) {
+                    const endDate = new Date(data.periodEnd);
+                    const dateStr = `${endDate.getFullYear()}/${endDate.getMonth() + 1}/${endDate.getDate()}`;
+                    showToast(`キャンセルを受け付けました。${dateStr} まで現在のプランをご利用いただけます`);
+                } else {
+                    showToast('キャンセルを受け付けました');
+                }
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session) await loadProfile(session.access_token);
                 updateAuthUI();
