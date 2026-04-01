@@ -239,11 +239,13 @@ app.post('/api/stripe/cancel', authMiddleware, async (req, res) => {
         }
 
         // 期間終了時にキャンセル（即時キャンセルではない）
-        await stripe.subscriptions.update(subscriptions.data[0].id, {
+        const sub = subscriptions.data[0];
+        await stripe.subscriptions.update(sub.id, {
             cancel_at_period_end: true
         });
 
-        res.json({ canceled: true });
+        const periodEnd = new Date(sub.current_period_end * 1000).toISOString();
+        res.json({ canceled: true, periodEnd });
     } catch (err) {
         console.error('キャンセルエラー:', err);
         res.status(500).json({ error: 'キャンセルに失敗しました' });

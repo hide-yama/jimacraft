@@ -1949,7 +1949,9 @@
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error);
 
-                showToast('サブスクリプションのキャンセルを受け付けました');
+                const endDate = new Date(data.periodEnd);
+                const dateStr = `${endDate.getFullYear()}/${endDate.getMonth() + 1}/${endDate.getDate()}`;
+                showToast(`キャンセルを受け付けました。${dateStr} まで現在のプランをご利用いただけます`);
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session) await loadProfile(session.access_token);
                 updateAuthUI();
