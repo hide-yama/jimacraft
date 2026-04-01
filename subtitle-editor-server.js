@@ -120,9 +120,27 @@ app.use((req, res, next) => {
 // ==================== 認証API ====================
 
 // ユーザー情報取得
-app.get('/api/me', authMiddleware, (req, res) => {
+app.get('/api/me', authMiddleware, async (req, res) => {
     const profile = req.profile;
     const limits = PLAN_LIMITS[profile.plan] || PLAN_LIMITS.free;
+
+    // Stripeのキャンセル予定状態を確認
+    let cancelAt = null;
+    if (stripe && profile.stripe_customer_id && profile.plan !== 'free') {
+        try {
+            const subs = await stripe.subscriptions.list({
+                customer: profile.stripe_customer_id,
+                status: 'active',
+                limit: 1
+            });
+            if (subs.data.length > 0 && subs.data[0].cancel_at_period_end) {
+                cancelAt = new Date(subs.data[0].current_period_end * 1000).toISOString();
+            }
+        } catch (err) {
+            // Stripe取得失敗は無視
+        }
+    }
+
     res.json({
         id: profile.id,
         email: profile.email,
@@ -131,6 +149,7 @@ app.get('/api/me', authMiddleware, (req, res) => {
         plan: profile.plan,
         usageCount: profile.usage_count,
         usageResetAt: profile.usage_reset_at,
+        cancelAt,
         limits: {
             steps: limits.steps,
             maxSpeakers: limits.maxSpeakers === Infinity ? null : limits.maxSpeakers,

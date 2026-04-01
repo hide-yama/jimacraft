@@ -1874,9 +1874,16 @@
                 const isCurrent = plan.id === currentPlan;
                 const isDowngrade = (currentPlan === 'pro' && plan.id !== 'pro') || (currentPlan === 'plus' && plan.id === 'free');
 
+                const cancelAt = currentProfile && currentProfile.cancelAt;
                 let btnHtml;
-                if (isCurrent) {
+                if (isCurrent && cancelAt) {
+                    const d = new Date(cancelAt);
+                    const dateStr = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+                    btnHtml = `<button class="pricing-card-btn current" disabled>キャンセル予定<br><small>${dateStr} まで利用可</small></button>`;
+                } else if (isCurrent) {
                     btnHtml = `<button class="pricing-card-btn current">現在のプラン</button>`;
+                } else if (plan.id === 'free' && currentPlan !== 'free' && cancelAt) {
+                    btnHtml = `<button class="pricing-card-btn current" disabled>キャンセル予定</button>`;
                 } else if (plan.id === 'free' && currentPlan !== 'free') {
                     btnHtml = `<button class="pricing-card-btn downgrade" onclick="cancelSubscription()">Freeに戻す</button>`;
                 } else if (plan.id === 'free') {
