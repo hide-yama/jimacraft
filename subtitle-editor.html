@@ -1740,10 +1740,11 @@
             const upgradeBtn = document.getElementById('auth-upgrade-btn');
             const manageBtn = document.getElementById('auth-manage-btn');
             if (currentProfile.plan === 'pro') {
-                upgradeBtn.style.display = 'none';
+                upgradeBtn.textContent = 'プラン変更';
+                upgradeBtn.style.display = '';
                 manageBtn.style.display = '';
             } else if (currentProfile.plan === 'plus') {
-                upgradeBtn.textContent = 'Proにアップグレード';
+                upgradeBtn.textContent = 'プラン変更';
                 upgradeBtn.style.display = '';
                 manageBtn.style.display = '';
             } else {
