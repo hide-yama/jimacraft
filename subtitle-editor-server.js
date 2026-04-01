@@ -133,8 +133,8 @@ app.get('/api/me', authMiddleware, async (req, res) => {
                 status: 'active',
                 limit: 1
             });
-            if (subs.data.length > 0 && subs.data[0].cancel_at_period_end) {
-                cancelAt = new Date(subs.data[0].current_period_end * 1000).toISOString();
+            if (subs.data.length > 0 && subs.data[0].cancel_at_period_end && subs.data[0].cancel_at) {
+                cancelAt = new Date(subs.data[0].cancel_at * 1000).toISOString();
             }
         } catch (err) {
             // Stripe取得失敗は無視
@@ -262,9 +262,9 @@ app.post('/api/stripe/cancel', authMiddleware, async (req, res) => {
             cancel_at_period_end: true
         });
 
-        // update のレスポンスから期間終了日を取得
-        const periodEndSec = updatedSub.current_period_end;
-        const periodEnd = periodEndSec ? new Date(periodEndSec * 1000).toISOString() : null;
+        // update のレスポンスからキャンセル日を取得
+        const cancelAtSec = updatedSub.cancel_at;
+        const periodEnd = cancelAtSec ? new Date(cancelAtSec * 1000).toISOString() : null;
         res.json({ canceled: true, periodEnd });
     } catch (err) {
         console.error('キャンセルエラー:', err);
