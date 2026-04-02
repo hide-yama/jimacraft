@@ -203,16 +203,12 @@ function splitSubtitle(subtitle) {
         content = text.substring(colonIdx + 1).trim();
     }
 
-    const parts = content.split('/');
+    const parts = content.split('/').map(p => p.trim()).filter(p => p);
     if (parts.length < 2) {
         return [subtitle];
     }
 
-    // 最初の/のみで分割
-    const part1 = parts[0].trim();
-    const part2 = parts.slice(1).join('/').trim();
-
-    const totalChars = part1.length + part2.length;
+    const totalChars = parts.reduce((sum, p) => sum + p.length, 0);
     if (totalChars === 0) {
         return [subtitle];
     }
@@ -221,29 +217,33 @@ function splitSubtitle(subtitle) {
     const endMs = timeToMs(subtitle.end);
     const totalDuration = endMs - startMs;
 
-    const part1Ratio = part1.length / totalChars;
-    let part1Duration = Math.floor(totalDuration * part1Ratio);
+    const result = [];
+    let currentStart = startMs;
 
-    // 最小表示時間を1秒に設定
-    part1Duration = Math.max(part1Duration, 1000);
-    const part2Duration = totalDuration - part1Duration + 2000; // +2秒延長
+    for (let i = 0; i < parts.length; i++) {
+        const partRatio = parts[i].length / totalChars;
+        let partDuration = Math.floor(totalDuration * partRatio);
+        // 最小表示時間を1秒に設定
+        partDuration = Math.max(partDuration, 1000);
 
-    const part1End = startMs + part1Duration;
-    const part2Start = part1End;
-    const part2End = part2Start + part2Duration;
-
-    return [
-        {
-            start: msToTime(startMs),
-            end: msToTime(part1End),
-            text: speaker + part1
-        },
-        {
-            start: msToTime(part2Start),
-            end: msToTime(part2End),
-            text: speaker + part2
+        let partEnd;
+        if (i === parts.length - 1) {
+            // 最後のパートは元の終了時間 + 2秒延長
+            partEnd = endMs + 2000;
+        } else {
+            partEnd = currentStart + partDuration;
         }
-    ];
+
+        result.push({
+            start: msToTime(currentStart),
+            end: msToTime(partEnd),
+            text: speaker + parts[i]
+        });
+
+        currentStart = partEnd;
+    }
+
+    return result;
 }
 
 function mergeSubtitles(subtitle1, subtitle2) {
