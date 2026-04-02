@@ -2212,7 +2212,9 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
                 }
             }
 
-            document.getElementById('wizard-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (newState === 'SPLIT') {
+                document.getElementById('screen2-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         function startEdit() {
