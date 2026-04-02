@@ -1437,7 +1437,7 @@
                     <div class="step-title">文字起こし → SRT変換</div>
                 </div>
 
-                <textarea id="step1-input" rows="12" placeholder="文字起こしテキストを貼り付けてください&#10;&#10;例:&#10;山田花子（女性）: [0:00] 今日はよろしくお願いします。&#10;鈴木太郎（男性）: [0:05] こちらこそよろしくお願いします。"></textarea>
+                <textarea id="step1-input" rows="20" placeholder="文字起こしテキストを貼り付けてください&#10;&#10;例:&#10;山田花子（女性）: [0:00] 今日はよろしくお願いします。&#10;鈴木太郎（男性）: [0:05] こちらこそよろしくお願いします。"></textarea>
 
                 <div class="btn-group">
                     <button class="btn btn-primary" id="wizard-convert-btn" onclick="runStep1()">SRTに変換</button>
@@ -1461,7 +1461,7 @@
                 <div class="stats" id="wizard-stats"></div>
 
                 <div class="result-label" style="margin-top: 12px;">生成されたSRT:</div>
-                <textarea id="wizard-srt" rows="14" readonly></textarea>
+                <textarea id="wizard-srt" rows="20" readonly></textarea>
 
                 <div class="btn-group">
                     <button class="btn btn-primary" id="btn-edit" onclick="startEdit()">編集</button>
@@ -1495,7 +1495,7 @@
                     <small style="color: #999;">処理順: 削除 → 結合 → 分割</small>
                 </div>
 
-                <textarea id="wizard-edit-input" rows="14" placeholder="マーカーを追加して編集してください。"></textarea>
+                <textarea id="wizard-edit-input" rows="20" placeholder="マーカーを追加して編集してください。"></textarea>
 
                 <div class="btn-group">
                     <button class="btn btn-primary" id="wizard-edit-btn" onclick="runStep2()">編集を実行</button>
