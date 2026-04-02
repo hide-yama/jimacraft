@@ -233,14 +233,55 @@
             font-size: 0.9em;
         }
 
-        /* 進むボタン */
-        .next-step-btn {
+        /* ウィザード状態 */
+        .wizard-state {
             display: none;
-            margin-top: 15px;
         }
 
-        .next-step-btn.visible {
+        .wizard-state.active {
             display: block;
+        }
+
+        .wizard-reset {
+            display: inline-block;
+            margin-top: 12px;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.88em;
+            text-decoration: underline;
+        }
+
+        .wizard-reset:hover {
+            color: var(--accent-hover);
+        }
+
+        .btn-locked {
+            background: #e8e8e8 !important;
+            color: #999 !important;
+            cursor: pointer !important;
+        }
+
+        .btn-locked:hover {
+            background: #ddd !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .screen2-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #666;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-bottom: 16px;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+
+        .screen2-back:hover {
+            color: var(--accent);
         }
 
         /* 話者タブ */
@@ -914,55 +955,8 @@
         }
 
         /* ステップロックオーバーレイ */
-        .step-lock-overlay {
-            display: none;
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 100;
-            border-radius: 12px;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .step-lock-overlay.visible {
-            display: flex;
-        }
-
         .step-section {
             position: relative;
-        }
-
-        .step-lock-icon {
-            width: 40px;
-            height: 40px;
-            stroke: #999;
-            fill: none;
-            stroke-width: 1.5;
-        }
-
-        .step-lock-text {
-            color: #888;
-            font-size: 0.95em;
-            text-align: center;
-        }
-
-        .step-lock-upgrade-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .step-lock-upgrade-btn:hover {
-            background: var(--accent-hover);
         }
 
         /* 料金モーダル */
@@ -1434,124 +1428,107 @@
         </div>
 
         <!-- ===== STEP 1 ===== -->
-        <div class="step-section" id="step1-section">
-            <div class="step-header">
-                <div class="step-number">1</div>
-                <div class="step-title">文字起こし → SRT変換</div>
-            </div>
-
-            <textarea id="step1-input" rows="12" placeholder="文字起こしテキストを貼り付けてください&#10;&#10;例:&#10;山田花子（女性）: [0:00] 今日はよろしくお願いします。&#10;鈴木太郎（男性）: [0:05] こちらこそよろしくお願いします。"></textarea>
-
-            <div class="btn-group">
-                <button class="btn btn-primary" id="step1-btn" onclick="runStep1()">SRTに変換</button>
-            </div>
-
-            <div class="loading" id="step1-loading">
-                <div class="spinner"></div>
-                <span>変換中...</span>
-            </div>
-
-            <div class="error-msg" id="step1-error"></div>
-
-            <div class="result-area" id="step1-result">
-                <div class="stats" id="step1-stats"></div>
-                <div class="result-label" style="margin-top: 12px;">生成されたSRT:</div>
-                <textarea id="step1-output" rows="10" readonly></textarea>
-                <div class="btn-group">
-                    <button class="btn btn-secondary" onclick="downloadText('step1-output', '字幕.srt')">SRTダウンロード</button>
-                    <button class="btn btn-secondary" onclick="copyText('step1-output')">コピー</button>
+        <!-- ===== ウィザードエリア ===== -->
+        <div class="step-section" id="wizard-area">
+            <!-- INPUT状態: テキスト入力 → SRT生成 -->
+            <div class="wizard-state active" id="wizard-input-state">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">文字起こし → SRT変換</div>
                 </div>
+
+                <textarea id="step1-input" rows="12" placeholder="文字起こしテキストを貼り付けてください&#10;&#10;例:&#10;山田花子（女性）: [0:00] 今日はよろしくお願いします。&#10;鈴木太郎（男性）: [0:05] こちらこそよろしくお願いします。"></textarea>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="wizard-convert-btn" onclick="runStep1()">SRTに変換</button>
+                </div>
+
+                <div class="loading" id="wizard-input-loading">
+                    <div class="spinner"></div>
+                    <span>変換中...</span>
+                </div>
+
+                <div class="error-msg" id="wizard-input-error"></div>
             </div>
 
-            <div class="next-step-btn" id="step1-next">
-                <button class="btn btn-primary" onclick="goToStep2()">Step 2 へ進む →</button>
+            <!-- VIEW状態: SRT表示 + アクションボタン -->
+            <div class="wizard-state" id="wizard-view-state">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">SRT字幕</div>
+                </div>
+
+                <div class="stats" id="wizard-stats"></div>
+
+                <div class="result-label" style="margin-top: 12px;">生成されたSRT:</div>
+                <textarea id="wizard-srt" rows="14" readonly></textarea>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="btn-edit" onclick="startEdit()">編集</button>
+                    <button class="btn btn-primary" id="btn-split" onclick="runStep3()">話者別分割</button>
+                    <button class="btn btn-secondary" onclick="downloadCurrentSrt()">SRTダウンロード</button>
+                    <button class="btn btn-secondary" onclick="copyCurrentSrt()">コピー</button>
+                </div>
+
+                <div class="loading" id="wizard-view-loading">
+                    <div class="spinner"></div>
+                    <span>処理中...</span>
+                </div>
+
+                <div class="error-msg" id="wizard-view-error"></div>
+
+                <a class="wizard-reset" onclick="resetWizard()">最初からやり直す</a>
+            </div>
+
+            <!-- EDIT状態: マーカー編集 -->
+            <div class="wizard-state" id="wizard-edit-state">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">マーカー編集</div>
+                </div>
+
+                <div class="marker-help">
+                    <strong>編集マーカー:</strong><br>
+                    <code>/</code> 分割 - その位置で字幕を2つに分ける<br>
+                    <code>-</code> 結合 - 行末に付けると同じ話者の次の字幕と結合<br>
+                    <code>x</code> 削除 - 行頭に付けるとその字幕を削除<br>
+                    <small style="color: #999;">処理順: 削除 → 結合 → 分割</small>
+                </div>
+
+                <textarea id="wizard-edit-input" rows="14" placeholder="マーカーを追加して編集してください。"></textarea>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="wizard-edit-btn" onclick="runStep2()">編集を実行</button>
+                    <button class="btn btn-secondary" onclick="cancelEdit()">キャンセル</button>
+                </div>
+
+                <div class="loading" id="wizard-edit-loading">
+                    <div class="spinner"></div>
+                    <span>編集処理中...</span>
+                </div>
+
+                <div class="error-msg" id="wizard-edit-error"></div>
             </div>
         </div>
 
-        <!-- ===== STEP 2 ===== -->
-        <div class="step-section" id="step2-section">
-            <div class="step-lock-overlay" id="step2-lock">
-                <svg class="step-lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                <div class="step-lock-text">Plusプラン以上で利用できます</div>
-                <button class="step-lock-upgrade-btn" onclick="openPricing()">アップグレード</button>
-            </div>
+        <!-- ===== Screen 2: 話者別分割結果 ===== -->
+        <div class="step-section" id="screen2-area" style="display: none;">
+            <button class="screen2-back" onclick="backToView()">← 戻る</button>
+
             <div class="step-header">
                 <div class="step-number">2</div>
-                <div class="step-title">マーカー編集</div>
-            </div>
-
-            <div class="marker-help">
-                <strong>編集マーカー:</strong><br>
-                <code>/</code> 分割 - その位置で字幕を2つに分ける<br>
-                <code>-</code> 結合 - 行末に付けると同じ話者の次の字幕と結合<br>
-                <code>x</code> 削除 - 行頭に付けるとその字幕を削除<br>
-                <small style="color: #999;">処理順: 削除 → 結合 → 分割</small>
-            </div>
-
-            <textarea id="step2-input" rows="14" placeholder="Step1の結果がここに入ります。マーカーを追加して編集してください。"></textarea>
-
-            <div class="btn-group">
-                <button class="btn btn-primary" id="step2-btn" onclick="runStep2()">編集を実行</button>
-            </div>
-
-            <div class="loading" id="step2-loading">
-                <div class="spinner"></div>
-                <span>編集処理中...</span>
-            </div>
-
-            <div class="error-msg" id="step2-error"></div>
-
-            <div class="result-area" id="step2-result">
-                <div class="stats" id="step2-stats"></div>
-                <div class="result-label" style="margin-top: 12px;">編集後のSRT:</div>
-                <textarea id="step2-output" rows="10" readonly></textarea>
-                <div class="btn-group">
-                    <button class="btn btn-secondary" onclick="downloadText('step2-output', '字幕_編集済み.srt')">SRTダウンロード</button>
-                    <button class="btn btn-secondary" onclick="copyText('step2-output')">コピー</button>
-                </div>
-            </div>
-
-            <div class="next-step-btn" id="step2-next">
-                <button class="btn btn-primary" onclick="goToStep3()">Step 3 へ進む →</button>
-            </div>
-        </div>
-
-        <!-- ===== STEP 3 ===== -->
-        <div class="step-section" id="step3-section">
-            <div class="step-lock-overlay" id="step3-lock">
-                <svg class="step-lock-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                <div class="step-lock-text">Proプランで利用できます</div>
-                <button class="step-lock-upgrade-btn" onclick="openPricing()">アップグレード</button>
-            </div>
-            <div class="step-header">
-                <div class="step-number">3</div>
                 <div class="step-title">話者別分割</div>
             </div>
 
-            <textarea id="step3-input" rows="10" placeholder="Step2の結果がここに入ります。" readonly></textarea>
-
-            <div class="btn-group">
-                <button class="btn btn-primary" id="step3-btn" onclick="runStep3()">話者別に分割</button>
+            <div class="stats" id="screen2-stats"></div>
+            <div class="speaker-tabs" id="speaker-tabs"></div>
+            <div class="speaker-content" id="speaker-content"></div>
+            <div class="btn-group" style="margin-top: 15px;">
+                <button class="btn btn-success" onclick="downloadAllSpeakers()">全てダウンロード</button>
             </div>
 
-            <div class="loading" id="step3-loading">
-                <div class="spinner"></div>
-                <span>分割処理中...</span>
-            </div>
-
-            <div class="error-msg" id="step3-error"></div>
-
-            <div class="result-area" id="step3-result">
-                <div class="stats" id="step3-stats"></div>
-                <div class="speaker-tabs" id="speaker-tabs"></div>
-                <div class="speaker-content" id="speaker-content"></div>
-                <div class="btn-group" style="margin-top: 15px;">
-                    <button class="btn btn-success" onclick="downloadAllSpeakers()">全てダウンロード</button>
-                </div>
-            </div>
-
-            <div class="next-step-btn" id="step3-next">
-                <button class="btn btn-primary" onclick="goToPremiere()">Premiere Pro へのインポート方法 →</button>
+            <div style="margin-top: 16px;">
+                <button class="btn btn-secondary" onclick="goToPremiere()">Premiere Pro へのインポート方法 →</button>
             </div>
         </div>
 
@@ -1634,6 +1611,9 @@
         let currentProfile = null;
         let supabaseClient = null;
         let billingYearly = false;
+        let wizardState = 'INPUT'; // 'INPUT' | 'VIEW' | 'EDIT' | 'SPLIT'
+        let currentSrt = '';
+        let lastStatsHtml = '';
 
         // ==================== Supabase初期化 ====================
 
@@ -1755,25 +1735,33 @@
         }
 
         function updatePlanGating() {
-            if (!currentProfile) return;
+            updateWizardButtons();
+        }
 
-            const plan = currentProfile.plan;
-            const steps = currentProfile.limits.steps;
+        function updateWizardButtons() {
+            const steps = currentProfile ? currentProfile.limits.steps : [1];
 
-            // Step 2 ロック
-            const step2Lock = document.getElementById('step2-lock');
+            const editBtn = document.getElementById('btn-edit');
+            const splitBtn = document.getElementById('btn-split');
+
             if (steps.includes(2)) {
-                step2Lock.classList.remove('visible');
+                editBtn.textContent = '編集';
+                editBtn.className = 'btn btn-primary';
+                editBtn.onclick = startEdit;
             } else {
-                step2Lock.classList.add('visible');
+                editBtn.textContent = '編集（アップグレード）';
+                editBtn.className = 'btn btn-primary btn-locked';
+                editBtn.onclick = openPricing;
             }
 
-            // Step 3 ロック
-            const step3Lock = document.getElementById('step3-lock');
             if (steps.includes(3)) {
-                step3Lock.classList.remove('visible');
+                splitBtn.textContent = '話者別分割';
+                splitBtn.className = 'btn btn-primary';
+                splitBtn.onclick = runStep3;
             } else {
-                step3Lock.classList.add('visible');
+                splitBtn.textContent = '話者別分割（アップグレード）';
+                splitBtn.className = 'btn btn-primary btn-locked';
+                splitBtn.onclick = openPricing;
             }
         }
 
@@ -2194,17 +2182,79 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
         }
 
         // ==================== Step 1 ====================
+        // ==================== ウィザード状態管理 ====================
+
+        function setWizardState(newState) {
+            // 全状態を非表示
+            document.getElementById('wizard-input-state').classList.remove('active');
+            document.getElementById('wizard-view-state').classList.remove('active');
+            document.getElementById('wizard-edit-state').classList.remove('active');
+
+            wizardState = newState;
+
+            if (newState === 'SPLIT') {
+                document.getElementById('wizard-area').style.display = 'none';
+                document.getElementById('screen2-area').style.display = '';
+            } else {
+                document.getElementById('wizard-area').style.display = '';
+                document.getElementById('screen2-area').style.display = 'none';
+
+                if (newState === 'INPUT') {
+                    document.getElementById('wizard-input-state').classList.add('active');
+                } else if (newState === 'VIEW') {
+                    document.getElementById('wizard-srt').value = currentSrt;
+                    document.getElementById('wizard-stats').innerHTML = lastStatsHtml;
+                    updateWizardButtons();
+                    document.getElementById('wizard-view-state').classList.add('active');
+                } else if (newState === 'EDIT') {
+                    document.getElementById('wizard-edit-input').value = currentSrt;
+                    document.getElementById('wizard-edit-state').classList.add('active');
+                }
+            }
+
+            document.getElementById('wizard-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function startEdit() {
+            setWizardState('EDIT');
+        }
+
+        function cancelEdit() {
+            setWizardState('VIEW');
+        }
+
+        function backToView() {
+            setWizardState('VIEW');
+        }
+
+        function resetWizard() {
+            currentSrt = '';
+            lastStatsHtml = '';
+            hideError('wizard-input-error');
+            setWizardState('INPUT');
+        }
+
+        function downloadCurrentSrt() {
+            downloadBlob(currentSrt, '字幕.srt');
+        }
+
+        function copyCurrentSrt() {
+            navigator.clipboard.writeText(currentSrt).then(() => {
+                showToast('コピーしました');
+            });
+        }
+
+        // ==================== Step 1: SRT変換 ====================
+
         async function runStep1() {
             const input = document.getElementById('step1-input').value;
             if (!input.trim()) {
-                showError('step1-error', 'テキストを入力してください');
+                showError('wizard-input-error', 'テキストを入力してください');
                 return;
             }
 
-            showLoading('step1');
-            hideError('step1-error');
-            hideResult('step1-result');
-            hideNext('step1-next');
+            showWizardLoading('input');
+            hideError('wizard-input-error');
 
             try {
                 const res = await authFetch('/api/step1/convert', {
@@ -2224,38 +2274,30 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
                 }
                 if (!res.ok) throw new Error(data.error || '変換に失敗しました');
 
-                document.getElementById('step1-output').value = data.srt;
-                document.getElementById('step1-stats').innerHTML =
+                currentSrt = data.srt;
+                lastStatsHtml =
                     `<div class="stat-item"><span class="stat-label">字幕数:</span><span class="stat-value">${data.subtitleCount}</span></div>` +
                     `<div class="stat-item"><span class="stat-label">話者:</span><span class="stat-value">${data.speakers.join(', ')}</span></div>`;
 
-                showResult('step1-result');
-                showNext('step1-next');
+                setWizardState('VIEW');
             } catch (err) {
-                showError('step1-error', err.message);
+                showError('wizard-input-error', err.message);
             } finally {
-                hideLoading('step1');
+                hideWizardLoading('input');
             }
         }
 
-        function goToStep2() {
-            const srt = document.getElementById('step1-output').value;
-            document.getElementById('step2-input').value = srt;
-            document.getElementById('step2-section').scrollIntoView({ behavior: 'smooth' });
-        }
+        // ==================== Step 2: マーカー編集 ====================
 
-        // ==================== Step 2 ====================
         async function runStep2() {
-            const input = document.getElementById('step2-input').value;
+            const input = document.getElementById('wizard-edit-input').value;
             if (!input.trim()) {
-                showError('step2-error', 'SRTテキストを入力してください');
+                showError('wizard-edit-error', 'SRTテキストを入力してください');
                 return;
             }
 
-            showLoading('step2');
-            hideError('step2-error');
-            hideResult('step2-result');
-            hideNext('step2-next');
+            showWizardLoading('edit');
+            hideError('wizard-edit-error');
 
             try {
                 const res = await authFetch('/api/step2/edit', {
@@ -2275,48 +2317,36 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
                 }
                 if (!res.ok) throw new Error(data.error || '編集に失敗しました');
 
-                document.getElementById('step2-output').value = data.srt;
-
+                currentSrt = data.srt;
                 const ops = data.operations;
-                document.getElementById('step2-stats').innerHTML =
+                lastStatsHtml =
                     `<div class="stat-item"><span class="stat-label">処理前:</span><span class="stat-value">${data.originalCount}個</span></div>` +
                     `<div class="stat-item"><span class="stat-label">処理後:</span><span class="stat-value">${data.editedCount}個</span></div>` +
                     `<div class="stat-item"><span class="stat-label">削除:</span><span class="stat-value">${ops.deleted}</span></div>` +
                     `<div class="stat-item"><span class="stat-label">結合:</span><span class="stat-value">${ops.merged}</span></div>` +
                     `<div class="stat-item"><span class="stat-label">分割:</span><span class="stat-value">${ops.split}</span></div>`;
 
-                showResult('step2-result');
-                showNext('step2-next');
+                setWizardState('VIEW');
             } catch (err) {
-                showError('step2-error', err.message);
+                showError('wizard-edit-error', err.message);
             } finally {
-                hideLoading('step2');
+                hideWizardLoading('edit');
             }
         }
 
-        function goToStep3() {
-            const srt = document.getElementById('step2-output').value;
-            document.getElementById('step3-input').value = srt;
-            document.getElementById('step3-section').scrollIntoView({ behavior: 'smooth' });
-        }
+        // ==================== Step 3: 話者別分割 ====================
 
-        // ==================== Step 3 ====================
         async function runStep3() {
-            const input = document.getElementById('step3-input').value;
-            if (!input.trim()) {
-                showError('step3-error', 'SRTテキストを入力してください');
-                return;
-            }
+            if (!currentSrt.trim()) return;
 
-            showLoading('step3');
-            hideError('step3-error');
-            hideResult('step3-result');
+            showWizardLoading('view');
+            hideError('wizard-view-error');
 
             try {
                 const res = await authFetch('/api/step3/split', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ srt: input })
+                    body: JSON.stringify({ srt: currentSrt })
                 });
 
                 const data = await res.json();
@@ -2344,7 +2374,7 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
                     return `${s}: ${speakerData[s].count}個`;
                 });
 
-                document.getElementById('step3-stats').innerHTML =
+                document.getElementById('screen2-stats').innerHTML =
                     `<div class="stat-item"><span class="stat-label">話者数:</span><span class="stat-value">${speakers.length}</span></div>` +
                     `<div class="stat-item"><span class="stat-label">合計字幕:</span><span class="stat-value">${totalCount}個</span></div>` +
                     `<div class="stat-item"><span class="stat-label">内訳:</span><span class="stat-value">${speakerStats.join(' / ')}</span></div>`;
@@ -2356,14 +2386,12 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
                 contentEl.innerHTML = '';
 
                 speakers.forEach((speaker, idx) => {
-                    // タブ
                     const tab = document.createElement('div');
                     tab.className = 'speaker-tab' + (idx === 0 ? ' active' : '');
                     tab.innerHTML = `${speaker}<span class="count-badge">${speakerData[speaker].count}</span>`;
                     tab.onclick = () => switchSpeaker(speaker);
                     tabsEl.appendChild(tab);
 
-                    // コンテンツ
                     const div = document.createElement('div');
                     div.className = 'speaker-srt' + (idx === 0 ? ' active' : '');
                     div.id = `speaker-${speaker}`;
@@ -2373,12 +2401,11 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
                     contentEl.appendChild(div);
                 });
 
-                showResult('step3-result');
-                showNext('step3-next');
+                setWizardState('SPLIT');
             } catch (err) {
-                showError('step3-error', err.message);
+                showError('wizard-view-error', err.message);
             } finally {
-                hideLoading('step3');
+                hideWizardLoading('view');
             }
         }
 
@@ -2390,7 +2417,6 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
             document.querySelectorAll('.speaker-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.speaker-srt').forEach(s => s.classList.remove('active'));
 
-            // タブをアクティブに
             const tabs = document.querySelectorAll('.speaker-tab');
             tabs.forEach(t => {
                 if (t.textContent.startsWith(speaker)) t.classList.add('active');
@@ -2422,14 +2448,18 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
 
         // ==================== ユーティリティ ====================
 
-        function showLoading(step) {
-            document.getElementById(`${step}-loading`).classList.add('visible');
-            document.getElementById(`${step}-btn`).disabled = true;
+        function showWizardLoading(state) {
+            const el = document.getElementById(`wizard-${state}-loading`);
+            if (el) el.classList.add('visible');
+            const btn = document.getElementById(state === 'input' ? 'wizard-convert-btn' : state === 'edit' ? 'wizard-edit-btn' : 'btn-split');
+            if (btn) btn.disabled = true;
         }
 
-        function hideLoading(step) {
-            document.getElementById(`${step}-loading`).classList.remove('visible');
-            document.getElementById(`${step}-btn`).disabled = false;
+        function hideWizardLoading(state) {
+            const el = document.getElementById(`wizard-${state}-loading`);
+            if (el) el.classList.remove('visible');
+            const btn = document.getElementById(state === 'input' ? 'wizard-convert-btn' : state === 'edit' ? 'wizard-edit-btn' : 'btn-split');
+            if (btn) btn.disabled = false;
         }
 
         function showError(id, msg) {
@@ -2442,25 +2472,23 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
             document.getElementById(id).classList.remove('visible');
         }
 
-        function showResult(id) {
-            document.getElementById(id).classList.add('visible');
+        function downloadBlob(text, filename) {
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
-        function hideResult(id) {
-            document.getElementById(id).classList.remove('visible');
-        }
-
-        function showNext(id) {
-            document.getElementById(id).classList.add('visible');
-        }
-
-        function hideNext(id) {
-            document.getElementById(id).classList.remove('visible');
-        }
-
-        function downloadText(textareaId, filename) {
+        function copyText(textareaId) {
             const text = document.getElementById(textareaId).value;
-            downloadBlob(text, filename);
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('コピーしました');
+            });
         }
 
         function downloadBlob(text, filename) {
