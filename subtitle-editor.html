@@ -1434,6 +1434,8 @@
                     <div class="step-title">文字起こし → SRT変換</div>
                 </div>
 
+                <button class="screen2-back" onclick="backToPrep()">← 準備ステップに戻る</button>
+
                 <textarea id="step1-input" rows="20" placeholder="文字起こしテキストを貼り付けてください&#10;&#10;例:&#10;山田花子（女性）: [0:00] 今日はよろしくお願いします。&#10;鈴木太郎（男性）: [0:05] こちらこそよろしくお願いします。"></textarea>
 
                 <div class="btn-group">
@@ -2081,8 +2083,13 @@
                 // 準備2完了 → Step1にフォーカス
                 document.getElementById('prep2-section').classList.remove('visible');
                 document.getElementById('step1-input').focus();
-                document.getElementById('step1-section').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('wizard-area').scrollIntoView({ behavior: 'smooth' });
             }
+        }
+
+        function backToPrep() {
+            document.getElementById('prep2-section').classList.add('visible');
+            document.getElementById('prep2-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         // OS切替
