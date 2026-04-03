@@ -1426,7 +1426,7 @@
 
         <!-- ===== STEP 1 ===== -->
         <!-- ===== ウィザードエリア ===== -->
-        <div class="step-section" id="wizard-area">
+        <div class="step-section" id="wizard-area" style="display: none;">
             <!-- INPUT状態: テキスト入力 → SRT生成 -->
             <div class="wizard-state active" id="wizard-input-state">
                 <div class="step-header">
@@ -2008,11 +2008,12 @@
                     document.getElementById('prep1-section').classList.remove('visible');
                     document.getElementById('prep2-section').classList.add('visible');
                 } else {
-                    // text: 準備不要、Step1にフォーカス
+                    // text: 準備不要、ウィザード表示
                     document.getElementById('prep1-section').classList.remove('visible');
                     document.getElementById('prep2-section').classList.remove('visible');
+                    document.getElementById('wizard-area').style.display = '';
                     document.getElementById('step1-input').focus();
-                    document.getElementById('step1-section').scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('wizard-area').scrollIntoView({ behavior: 'smooth' });
                 }
             }, 150);
         }
@@ -2023,6 +2024,7 @@
             document.getElementById('prep-selected-bar').classList.remove('visible');
             document.getElementById('prep1-section').classList.remove('visible');
             document.getElementById('prep2-section').classList.remove('visible');
+            document.getElementById('wizard-area').style.display = 'none';
 
             // カード選択リセット
             document.querySelectorAll('.prep-card').forEach(c => c.classList.remove('selected'));
@@ -2080,14 +2082,16 @@
                 document.getElementById('prep2-section').classList.add('visible');
                 document.getElementById('prep2-section').scrollIntoView({ behavior: 'smooth' });
             } else if (prep === 'prep2') {
-                // 準備2完了 → Step1にフォーカス
+                // 準備2完了 → ウィザード表示
                 document.getElementById('prep2-section').classList.remove('visible');
+                document.getElementById('wizard-area').style.display = '';
                 document.getElementById('step1-input').focus();
                 document.getElementById('wizard-area').scrollIntoView({ behavior: 'smooth' });
             }
         }
 
         function backToPrep() {
+            document.getElementById('wizard-area').style.display = 'none';
             document.getElementById('prep2-section').classList.add('visible');
             document.getElementById('prep2-section').scrollIntoView({ behavior: 'smooth' });
         }
