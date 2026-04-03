@@ -39,7 +39,7 @@ function parseSrtWithoutNumbers(content) {
                     subtitles.push({
                         start: match[1],
                         end: match[2],
-                        text: textLines.join(' ')
+                        text: textLines.join('\n')
                     });
                 }
             } else {
