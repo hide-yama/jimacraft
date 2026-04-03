@@ -1256,10 +1256,10 @@
             <button class="auth-logout-btn" onclick="logout()">ログアウト</button>
         </div>
 
-        <div style="text-align: center; margin-bottom: -4px;">
+        <div style="text-align: center; margin-bottom: -4px; cursor: pointer;" onclick="goHome()">
             <img src="/logo.png" alt="jimacraft" style="width: 72px; height: 72px; border-radius: 14px;">
         </div>
-        <h1 style="margin-top: 4px;">jimacraft</h1>
+        <h1 style="margin-top: 4px; cursor: pointer;" onclick="goHome()">jimacraft</h1>
         <p class="subtitle-header">文字起こしテキストからSRT字幕ファイルを生成</p>
 
         <!-- ===== 初期選択 ===== -->
@@ -2018,6 +2018,12 @@
                     document.getElementById('wizard-area').scrollIntoView({ behavior: 'smooth' });
                 }
             }, 150);
+        }
+
+        function goHome() {
+            resetPrepSelection();
+            setWizardState('INPUT');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function resetPrepSelection() {
