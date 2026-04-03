@@ -1532,7 +1532,7 @@
         </div>
 
         <!-- ===== Premiere Pro インポートガイド ===== -->
-        <div class="step-section" id="premiere-section">
+        <div class="step-section" id="premiere-section" style="display: none;">
             <div class="step-header">
                 <div class="step-number" style="background: var(--accent);">P</div>
                 <div class="step-title">Premiere Pro に字幕をインポート</div>
@@ -2215,9 +2215,11 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
             if (newState === 'SPLIT') {
                 document.getElementById('wizard-area').style.display = 'none';
                 document.getElementById('screen2-area').style.display = '';
+                document.getElementById('premiere-section').style.display = '';
             } else {
                 document.getElementById('wizard-area').style.display = '';
                 document.getElementById('screen2-area').style.display = 'none';
+                document.getElementById('premiere-section').style.display = 'none';
 
                 if (newState === 'INPUT') {
                     document.getElementById('wizard-input-state').classList.add('active');
