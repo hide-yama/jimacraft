@@ -1452,7 +1452,7 @@
                 <div class="error-msg" id="wizard-input-error"></div>
             </div>
 
-            <!-- VIEW状態: SRT表示 + アクションボタン -->
+            <!-- VIEW状態: SRT表示・編集 + アクションボタン -->
             <div class="wizard-state" id="wizard-view-state">
                 <div class="step-header">
                     <div class="step-number">1</div>
@@ -1461,11 +1461,18 @@
 
                 <div class="stats" id="wizard-stats"></div>
 
-                <div class="result-label" style="margin-top: 12px;">生成されたSRT:</div>
-                <textarea id="wizard-srt" rows="20" readonly></textarea>
+                <div class="marker-help" style="margin-top: 12px;">
+                    <strong>編集マーカー:</strong><br>
+                    <code>/</code> 分割 - その位置で字幕を2つに分ける<br>
+                    <code>-</code> 結合 - 行末に付けると同じ話者の次の字幕と結合<br>
+                    <code>x</code> 削除 - 行頭に付けるとその字幕を削除<br>
+                    <small style="color: #999;">処理順: 削除 → 結合 → 分割</small>
+                </div>
+
+                <textarea id="wizard-srt" rows="20"></textarea>
 
                 <div class="btn-group">
-                    <button class="btn btn-primary" id="btn-edit" onclick="startEdit()">編集</button>
+                    <button class="btn btn-primary" id="btn-edit" onclick="runStep2()">編集を実行</button>
                     <button class="btn btn-primary" id="btn-split" onclick="runStep3()">話者別分割</button>
                     <button class="btn btn-secondary" onclick="downloadCurrentSrt()">SRTダウンロード</button>
                     <button class="btn btn-secondary" onclick="copyCurrentSrt()">コピー</button>
@@ -1481,36 +1488,6 @@
                 <div style="margin-top: 12px;">
                     <button class="btn btn-secondary" onclick="resetWizard()">← 戻る</button>
                 </div>
-            </div>
-
-            <!-- EDIT状態: マーカー編集 -->
-            <div class="wizard-state" id="wizard-edit-state">
-                <div class="step-header">
-                    <div class="step-number">1</div>
-                    <div class="step-title">マーカー編集</div>
-                </div>
-
-                <div class="marker-help">
-                    <strong>編集マーカー:</strong><br>
-                    <code>/</code> 分割 - その位置で字幕を2つに分ける<br>
-                    <code>-</code> 結合 - 行末に付けると同じ話者の次の字幕と結合<br>
-                    <code>x</code> 削除 - 行頭に付けるとその字幕を削除<br>
-                    <small style="color: #999;">処理順: 削除 → 結合 → 分割</small>
-                </div>
-
-                <textarea id="wizard-edit-input" rows="20" placeholder="マーカーを追加して編集してください。"></textarea>
-
-                <div class="btn-group">
-                    <button class="btn btn-primary" id="wizard-edit-btn" onclick="runStep2()">編集を実行</button>
-                    <button class="btn btn-secondary" onclick="cancelEdit()">キャンセル</button>
-                </div>
-
-                <div class="loading" id="wizard-edit-loading">
-                    <div class="spinner"></div>
-                    <span>編集処理中...</span>
-                </div>
-
-                <div class="error-msg" id="wizard-edit-error"></div>
             </div>
         </div>
 
@@ -1748,11 +1725,11 @@
             const splitBtn = document.getElementById('btn-split');
 
             if (steps.includes(2)) {
-                editBtn.textContent = '編集';
+                editBtn.textContent = '編集を実行';
                 editBtn.className = 'btn btn-primary';
-                editBtn.onclick = startEdit;
+                editBtn.onclick = runStep2;
             } else {
-                editBtn.textContent = '編集（アップグレード）';
+                editBtn.textContent = '編集を実行（アップグレード）';
                 editBtn.className = 'btn btn-primary btn-locked';
                 editBtn.onclick = openPricing;
             }
@@ -2222,7 +2199,6 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
             // 全状態を非表示
             document.getElementById('wizard-input-state').classList.remove('active');
             document.getElementById('wizard-view-state').classList.remove('active');
-            document.getElementById('wizard-edit-state').classList.remove('active');
 
             wizardState = newState;
 
@@ -2242,23 +2218,12 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
                     document.getElementById('wizard-stats').innerHTML = lastStatsHtml;
                     updateWizardButtons();
                     document.getElementById('wizard-view-state').classList.add('active');
-                } else if (newState === 'EDIT') {
-                    document.getElementById('wizard-edit-input').value = currentSrt;
-                    document.getElementById('wizard-edit-state').classList.add('active');
                 }
             }
 
             if (newState === 'SPLIT') {
                 document.getElementById('screen2-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-        }
-
-        function startEdit() {
-            setWizardState('EDIT');
-        }
-
-        function cancelEdit() {
-            setWizardState('VIEW');
         }
 
         function backToView() {
@@ -2273,11 +2238,13 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
         }
 
         function downloadCurrentSrt() {
-            downloadBlob(currentSrt, '字幕.srt');
+            const srt = document.getElementById('wizard-srt').value;
+            downloadBlob(srt, '字幕.srt');
         }
 
         function copyCurrentSrt() {
-            navigator.clipboard.writeText(currentSrt).then(() => {
+            const srt = document.getElementById('wizard-srt').value;
+            navigator.clipboard.writeText(srt).then(() => {
                 showToast('コピーしました');
             });
         }
@@ -2328,14 +2295,14 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
         // ==================== Step 2: マーカー編集 ====================
 
         async function runStep2() {
-            const input = document.getElementById('wizard-edit-input').value;
+            const input = document.getElementById('wizard-srt').value;
             if (!input.trim()) {
-                showError('wizard-edit-error', 'SRTテキストを入力してください');
+                showError('wizard-view-error', 'SRTテキストを入力してください');
                 return;
             }
 
-            showWizardLoading('edit');
-            hideError('wizard-edit-error');
+            showWizardLoading('view');
+            hideError('wizard-view-error');
 
             try {
                 const res = await authFetch('/api/step2/edit', {
@@ -2366,9 +2333,9 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
 
                 setWizardState('VIEW');
             } catch (err) {
-                showError('wizard-edit-error', err.message);
+                showError('wizard-view-error', err.message);
             } finally {
-                hideWizardLoading('edit');
+                hideWizardLoading('view');
             }
         }
 
