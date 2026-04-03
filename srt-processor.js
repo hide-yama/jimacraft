@@ -384,10 +384,10 @@ function splitBySpeaker(srtContent) {
     const speakerSubtitles = {};
 
     for (const sub of subtitles) {
-        const match = sub.text.match(/^([^:]+):\s*(.+)$/);
+        const match = sub.text.match(/^([^:]+):\s*([\s\S]+)$/);
         if (match) {
             const speaker = match[1];
-            const contentText = match[2];
+            const contentText = match[2].trim();
 
             if (!speakerSubtitles[speaker]) {
                 speakerSubtitles[speaker] = [];
