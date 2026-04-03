@@ -726,6 +726,10 @@
             border-radius: 6px;
             font-size: 0.9em;
             margin-top: 14px;
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
         }
 
         .content-desc-input:focus {
@@ -1379,7 +1383,7 @@
                 <button class="add-speaker-btn" onclick="addSpeakerRow()">＋ 話者を追加</button>
 
                 <div class="content-desc-label">内容の説明（任意）</div>
-                <input type="text" class="content-desc-input" id="content-desc" placeholder="例: バラエティ番組の対談">
+                <textarea class="content-desc-input" id="content-desc" rows="3" placeholder="例: バラエティ番組の対談"></textarea>
 
                 <div class="substep-nav">
                     <button class="btn btn-primary" onclick="nextSubstep('prep2', 1)">次へ →</button>
