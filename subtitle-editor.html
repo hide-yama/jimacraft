@@ -1508,76 +1508,43 @@
             </div>
 
             <div style="margin-top: 16px;">
-                <button class="btn btn-secondary" onclick="goToPremiere()">Premiere Pro へのインポート方法 →</button>
+                <button class="btn btn-secondary" onclick="openPremiereGuide()">Premiere Pro へのインポート方法</button>
             </div>
         </div>
 
-        <!-- ===== Premiere Pro インポートガイド ===== -->
-        <div class="step-section" id="premiere-section" style="display: none;">
-            <div class="step-header">
-                <div class="step-number" style="background: var(--accent);">P</div>
-                <div class="step-title">Premiere Pro に字幕をインポート</div>
+        <!-- Premiere Pro インポートガイド モーダル -->
+        <div class="pricing-overlay" id="premiere-guide-overlay">
+            <div class="pricing-modal" style="max-width: 700px;">
+                <button class="pricing-close" onclick="closePremiereGuide()">&times;</button>
+                <h2 style="text-align: center; margin-bottom: 20px; font-size: 1.2em;">Premiere Pro に字幕をインポート</h2>
+
+                <div class="marker-help" style="background:#f8f8f8;border-color:#ddd;">
+                    <strong>SRTファイルのインポート手順</strong><br>
+                    ダウンロードしたSRTファイルをPremiere Proのプロジェクトに読み込みます。
+                </div>
+
+                <ol class="guide-steps">
+                    <li><span class="guide-step-num">1</span><span>Premiere Pro でプロジェクトを開き、字幕を入れたいシーケンスを表示</span></li>
+                    <li><span class="guide-step-num">2</span><span><strong>ファイル → 読み込み</strong>（Ctrl+I / Cmd+I）でSRTファイルを選択</span></li>
+                    <li><span class="guide-step-num">3</span><span>プロジェクトパネルに読み込まれたSRTファイルを<strong>タイムラインにドラッグ&ドロップ</strong></span></li>
+                    <li><span class="guide-step-num">4</span><span>キャプショントラックが自動生成され、字幕が配置される</span></li>
+                </ol>
+
+                <div style="margin-top:18px;margin-bottom:10px;font-weight:600;color:#555;font-size:0.95em;">話者別SRTを使う場合</div>
+                <ol class="guide-steps">
+                    <li><span class="guide-step-num">1</span><span>話者ごとのSRTファイルをそれぞれ読み込み</span></li>
+                    <li><span class="guide-step-num">2</span><span>各SRTを別々のキャプショントラックにドラッグ（トラックが自動追加される）</span></li>
+                    <li><span class="guide-step-num">3</span><span><strong>プロパティパネル</strong>で話者ごとにフォント・色・位置を設定</span></li>
+                </ol>
+
+                <div style="margin-top:18px;margin-bottom:10px;font-weight:600;color:#555;font-size:0.95em;">字幕のスタイル調整（プロパティパネル）</div>
+                <ol class="guide-steps">
+                    <li><span class="guide-step-num">1</span><span>画面上部のメニューバーから <strong>ウィンドウ → プロパティ</strong> をクリック</span></li>
+                    <li><span class="guide-step-num">2</span><span>画面右側にプロパティパネルが表示される</span></li>
+                    <li><span class="guide-step-num">3</span><span>タイムライン上の<strong>字幕クリップをクリック</strong>して選択（青くハイライトされる）</span></li>
+                    <li><span class="guide-step-num">4</span><span>プロパティパネルに字幕の編集項目が表示されるので、ここでスタイルを変更</span></li>
+                </ol>
             </div>
-
-            <div class="marker-help" style="background:#f8f8f8;border-color:#ddd;">
-                <strong>SRTファイルのインポート手順</strong><br>
-                ダウンロードしたSRTファイルをPremiere Proのプロジェクトに読み込みます。
-            </div>
-
-            <ol class="guide-steps">
-                <li>
-                    <span class="guide-step-num">1</span>
-                    <span>Premiere Pro でプロジェクトを開き、字幕を入れたいシーケンスを表示</span>
-                </li>
-                <li>
-                    <span class="guide-step-num">2</span>
-                    <span><strong>ファイル → 読み込み</strong>（Ctrl+I / Cmd+I）でSRTファイルを選択</span>
-                </li>
-                <li>
-                    <span class="guide-step-num">3</span>
-                    <span>プロジェクトパネルに読み込まれたSRTファイルを<strong>タイムラインにドラッグ&ドロップ</strong></span>
-                </li>
-                <li>
-                    <span class="guide-step-num">4</span>
-                    <span>キャプショントラックが自動生成され、字幕が配置される</span>
-                </li>
-            </ol>
-
-            <div style="margin-top:18px;margin-bottom:10px;font-weight:600;color:#555;font-size:0.95em;">話者別SRTを使う場合</div>
-            <ol class="guide-steps">
-                <li>
-                    <span class="guide-step-num">1</span>
-                    <span>話者ごとのSRTファイルをそれぞれ読み込み</span>
-                </li>
-                <li>
-                    <span class="guide-step-num">2</span>
-                    <span>各SRTを別々のキャプショントラックにドラッグ（トラックが自動追加される）</span>
-                </li>
-                <li>
-                    <span class="guide-step-num">3</span>
-                    <span><strong>プロパティパネル</strong>で話者ごとにフォント・色・位置を設定</span>
-                </li>
-            </ol>
-
-            <div style="margin-top:18px;margin-bottom:10px;font-weight:600;color:#555;font-size:0.95em;">字幕のスタイル調整（プロパティパネル）</div>
-            <ol class="guide-steps">
-                <li>
-                    <span class="guide-step-num">1</span>
-                    <span>画面上部のメニューバーから <strong>ウィンドウ → プロパティ</strong> をクリック</span>
-                </li>
-                <li>
-                    <span class="guide-step-num">2</span>
-                    <span>画面右側にプロパティパネルが表示される</span>
-                </li>
-                <li>
-                    <span class="guide-step-num">3</span>
-                    <span>タイムライン上の<strong>字幕クリップをクリック</strong>して選択（青くハイライトされる）</span>
-                </li>
-                <li>
-                    <span class="guide-step-num">4</span>
-                    <span>プロパティパネルに字幕の編集項目が表示されるので、ここでスタイルを変更</span>
-                </li>
-            </ol>
         </div>
     </div>
 
@@ -2205,11 +2172,9 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
             if (newState === 'SPLIT') {
                 document.getElementById('wizard-area').style.display = 'none';
                 document.getElementById('screen2-area').style.display = '';
-                document.getElementById('premiere-section').style.display = '';
             } else {
                 document.getElementById('wizard-area').style.display = '';
                 document.getElementById('screen2-area').style.display = 'none';
-                document.getElementById('premiere-section').style.display = 'none';
 
                 if (newState === 'INPUT') {
                     document.getElementById('wizard-input-state').classList.add('active');
@@ -2414,8 +2379,12 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
             }
         }
 
-        function goToPremiere() {
-            document.getElementById('premiere-section').scrollIntoView({ behavior: 'smooth' });
+        function openPremiereGuide() {
+            document.getElementById('premiere-guide-overlay').classList.add('visible');
+        }
+
+        function closePremiereGuide() {
+            document.getElementById('premiere-guide-overlay').classList.remove('visible');
         }
 
         function switchSpeaker(speaker) {
