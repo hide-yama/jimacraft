@@ -2366,7 +2366,7 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
                     div.className = 'speaker-srt' + (idx === 0 ? ' active' : '');
                     div.id = `speaker-${speaker}`;
                     div.innerHTML =
-                        `<textarea rows="10" readonly style="width:100%;font-family:'Courier New',Consolas,monospace;font-size:13px;border:none;resize:vertical;">${escapeHtml(speakerData[speaker].srt)}</textarea>` +
+                        `<textarea rows="10" id="speaker-srt-${escapeAttr(speaker)}" style="width:100%;font-family:'Courier New',Consolas,monospace;font-size:13px;border:1px solid #ddd;border-radius:8px;padding:12px;resize:vertical;">${escapeHtml(speakerData[speaker].srt)}</textarea>` +
                         `<div class="btn-group"><button class="btn btn-secondary" onclick="downloadSpeaker('${escapeAttr(speaker)}')">ダウンロード: 字幕_${escapeHtml(speaker)}.srt</button><button class="btn btn-secondary" onclick="copySpeakerSrt('${escapeAttr(speaker)}')">コピー</button></div>`;
                     contentEl.appendChild(div);
                 });
@@ -2401,22 +2401,22 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
         }
 
         function downloadSpeaker(speaker) {
-            if (speakerData[speaker]) {
-                downloadBlob(speakerData[speaker].srt, `字幕_${speaker}.srt`);
-            }
+            const el = document.getElementById(`speaker-srt-${speaker}`);
+            if (el) downloadBlob(el.value, `字幕_${speaker}.srt`);
         }
 
         function copySpeakerSrt(speaker) {
-            if (speakerData[speaker]) {
-                navigator.clipboard.writeText(speakerData[speaker].srt).then(() => {
+            const el = document.getElementById(`speaker-srt-${speaker}`);
+            if (el) {
+                navigator.clipboard.writeText(el.value).then(() => {
                     showToast('コピーしました');
                 });
             }
         }
 
         function downloadAllSpeakers() {
-            for (const [speaker, data] of Object.entries(speakerData)) {
-                downloadBlob(data.srt, `字幕_${speaker}.srt`);
+            for (const speaker of Object.keys(speakerData)) {
+                downloadSpeaker(speaker);
             }
         }
 
