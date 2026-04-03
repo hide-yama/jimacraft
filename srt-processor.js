@@ -20,7 +20,7 @@ function msToTime(ms) {
 }
 
 function parseSrtWithoutNumbers(content) {
-    const lines = content.trim().split('\n').map(l => l.trim()).filter(l => l);
+    const lines = content.trim().split('\n').map(l => l.trim());
     const subtitles = [];
     let i = 0;
 
@@ -28,18 +28,25 @@ function parseSrtWithoutNumbers(content) {
         const line = lines[i];
         if (line.includes(' --> ')) {
             const match = line.match(/(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})/);
-            if (match && i + 1 < lines.length) {
-                subtitles.push({
-                    start: match[1],
-                    end: match[2],
-                    text: lines[i + 1]
-                });
-                i += 2;
+            if (match) {
+                i++;
+                const textLines = [];
+                while (i < lines.length && !lines[i].includes(' --> ') && lines[i] !== '') {
+                    textLines.push(lines[i]);
+                    i++;
+                }
+                if (textLines.length > 0) {
+                    subtitles.push({
+                        start: match[1],
+                        end: match[2],
+                        text: textLines.join(' ')
+                    });
+                }
             } else {
-                i += 1;
+                i++;
             }
         } else {
-            i += 1;
+            i++;
         }
     }
     return subtitles;
