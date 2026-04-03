@@ -1386,17 +1386,15 @@
                 <textarea class="content-desc-input" id="content-desc" rows="7" placeholder="例: バラエティ番組の対談"></textarea>
 
                 <div class="substep-nav">
-                    <button class="btn btn-primary" onclick="nextSubstep('prep2', 1)">次へ →</button>
+                    <button class="btn btn-primary" onclick="generatePromptAndNext()">プロンプトを生成 →</button>
                 </div>
             </div>
 
-            <!-- サブステップ 2-2: プロンプト生成 -->
+            <!-- サブステップ 2-2: プロンプト確認・コピー -->
             <div class="substep" data-prep="2" data-substep="1">
-                <div class="substep-label">プロンプトを生成してコピー</div>
+                <div class="substep-label">プロンプトをコピー</div>
 
-                <button class="btn btn-primary" onclick="generatePrompt()">プロンプトを生成</button>
-
-                <div class="generated-prompt" id="generated-prompt">
+                <div class="generated-prompt" id="generated-prompt" style="display: block;">
                     <textarea id="prompt-output" rows="14" readonly></textarea>
                     <div class="btn-group">
                         <button class="btn btn-secondary" onclick="copyText('prompt-output')">プロンプトをコピー</button>
@@ -2183,6 +2181,14 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
 
             document.getElementById('prompt-output').value = prompt;
             document.getElementById('generated-prompt').classList.add('visible');
+        }
+
+        function generatePromptAndNext() {
+            generatePrompt();
+            // generatePromptが成功した場合のみ次へ（話者0人だとreturnされる）
+            if (document.getElementById('prompt-output').value) {
+                nextSubstep('prep2', 1);
+            }
         }
 
         // ==================== Step 1 ====================
