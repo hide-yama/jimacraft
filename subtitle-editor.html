@@ -1207,6 +1207,22 @@
         </div>
     </div>
 
+    <!-- AI Studio 使い方モーダル -->
+    <div class="pricing-overlay" id="aistudio-guide-overlay">
+        <div class="pricing-modal" style="max-width: 600px;">
+            <button class="pricing-close" onclick="closeAiStudioGuide()">&times;</button>
+            <h2 style="text-align: center; margin-bottom: 8px; font-size: 1.2em;">Google AI Studio の使い方</h2>
+            <p style="text-align: center; color: #888; margin-bottom: 20px; font-size: 0.9em;">プロンプトをコピーしてから以下の手順で文字起こし</p>
+            <ol class="guide-steps">
+                <li><span class="guide-step-num">1</span><span><a href="https://aistudio.google.com/" target="_blank" rel="noopener" class="guide-link">Google AI Studio</a> を開く</span></li>
+                <li><span class="guide-step-num">2</span><span>MP3ファイルをアップロード</span></li>
+                <li><span class="guide-step-num">3</span><span>コピーしたプロンプトを貼り付け</span></li>
+                <li><span class="guide-step-num">4</span><span>実行して結果を待つ</span></li>
+                <li><span class="guide-step-num">5</span><span>文字起こし結果をコピー</span></li>
+            </ol>
+        </div>
+    </div>
+
     <!-- 料金モーダル -->
     <div class="pricing-overlay" id="pricing-overlay">
         <div class="pricing-modal">
@@ -1362,7 +1378,6 @@
             <div class="substep-indicator" id="prep2-indicator">
                 <div class="substep-dot active"></div>
                 <div class="substep-dot"></div>
-                <div class="substep-dot"></div>
             </div>
 
             <!-- サブステップ 2-1: 話者情報入力 -->
@@ -1392,38 +1407,18 @@
 
             <!-- サブステップ 2-2: プロンプト確認・コピー -->
             <div class="substep" data-prep="2" data-substep="1">
-                <div class="substep-label">プロンプトをコピー</div>
+                <div class="substep-label">プロンプトをコピーして文字起こし</div>
 
                 <div class="generated-prompt" id="generated-prompt" style="display: block;">
                     <textarea id="prompt-output" rows="14" readonly></textarea>
                     <div class="btn-group">
                         <button class="btn btn-secondary" onclick="copyText('prompt-output')">プロンプトをコピー</button>
+                        <button class="btn btn-secondary" onclick="openAiStudioGuide()">Google AI Studio の使い方</button>
                     </div>
                 </div>
 
                 <div class="substep-nav">
                     <button class="btn btn-secondary" onclick="prevSubstep('prep2', 0)">← 戻る</button>
-                    <button class="btn btn-primary" onclick="nextSubstep('prep2', 2)">次へ →</button>
-                </div>
-            </div>
-
-            <!-- サブステップ 2-3: AI Studio手順 -->
-            <div class="substep" data-prep="2" data-substep="2">
-                <div class="substep-label">Google AI Studio で文字起こし</div>
-
-                <p style="font-size:0.92em;color:#555;margin-bottom:14px;">
-                    <a href="https://aistudio.google.com/" target="_blank" rel="noopener" class="guide-link">Google AI Studio を開く</a>
-                </p>
-
-                <ol class="guide-steps">
-                    <li><span class="guide-step-num">1</span><span>MP3ファイルをアップロード</span></li>
-                    <li><span class="guide-step-num">2</span><span>先ほどコピーしたプロンプトを貼り付け</span></li>
-                    <li><span class="guide-step-num">3</span><span>実行して結果を待つ</span></li>
-                    <li><span class="guide-step-num">4</span><span>文字起こし結果をコピー</span></li>
-                </ol>
-
-                <div class="substep-nav">
-                    <button class="btn btn-secondary" onclick="prevSubstep('prep2', 1)">← 戻る</button>
                     <button class="btn btn-primary" onclick="completePrepStep('prep2')">文字起こしが完了したら次へ →</button>
                 </div>
             </div>
@@ -2181,6 +2176,14 @@ ${speakers.map(s => `- ${s.name}（${s.gender}）`).join('\n')}`;
 
             document.getElementById('prompt-output').value = prompt;
             document.getElementById('generated-prompt').classList.add('visible');
+        }
+
+        function openAiStudioGuide() {
+            document.getElementById('aistudio-guide-overlay').classList.add('visible');
+        }
+
+        function closeAiStudioGuide() {
+            document.getElementById('aistudio-guide-overlay').classList.remove('visible');
         }
 
         function generatePromptAndNext() {
